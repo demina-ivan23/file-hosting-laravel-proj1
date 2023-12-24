@@ -48,4 +48,8 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(User::class, 'user_user', 'user_id_1', 'user_id_2')->withTimestamps();
     }
+    public function files()
+    {
+        return $this->belongsToMany(File::class);
+    }
 }

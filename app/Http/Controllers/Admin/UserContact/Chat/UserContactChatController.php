@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Admin\UserContact\Chat;
 
+use App\Models\File;
 use App\Models\User;
 use Illuminate\Http\Request;
+use App\Services\FileUploadService;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Gate;
 use App\Http\Requests\UserContact\SendFileRequest;
@@ -31,7 +33,23 @@ class UserContactChatController extends Controller
      */
     public function store(SendFileRequest $request)
     {
-        //
+        $authUser = auth()->user();
+        $data = $request->all();
+        if($request->hasFile('file'))
+        {
+            $fileloader = new FileUploadService();
+            $path = $fileloader->UploadFile($request->file('file'));
+            $file = File::create([
+                'path' => $path,
+                'title' => $data['title'],
+                'description' => $data['description'],
+                'category' => $data['category']
+
+            ]);
+            $file->sender()->attach($authUser);
+            $authUser->files()->attach($file);
+            return redirect()->route('admin.contacts.dashboard')->with('success', 'File Uploaded Successfully');
+        }
     }
 
     /**
