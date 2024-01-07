@@ -35,7 +35,7 @@
                </ul>
             </div>
             @endif
-            <form action="{{ route('admin.contact.store', ['user' => $contact_user->id]) }}" method="POST" enctype="multipart/form-data">
+            <form action="{{ route('admin.files.store', ['user' => $contact_user->id]) }}" method="POST" enctype="multipart/form-data">
                 @csrf
 
 <div class="p-3">

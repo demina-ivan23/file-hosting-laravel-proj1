@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Admin\Files;
 
 use App\Models\File;
+use App\Models\User;
 use Illuminate\Http\Request;
+use App\Services\FileUploadService;
 use App\Http\Controllers\Controller;
+
 
 class FilesController extends Controller
 {
@@ -12,8 +15,10 @@ class FilesController extends Controller
      * Display a listing of the resource.
      */
     public function index()
-    {
-        $files = File::all();
+    { 
+        $authUser = User::find(auth()->user()->id);
+        $files = $authUser->files()->latest()->get();
+        
         return view('admin.files.index', ['files' => $files]);
     }
 
@@ -30,7 +35,23 @@ class FilesController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $authUser = User::find(auth()->user()->id);
+        $data = $request->all();
+        if($request->hasFile('file'))
+        {
+            $fileloader = new FileUploadService();
+            $path = $fileloader->UploadFile($request->file('file'));
+            $file = File::create([
+                'path' => $path,
+                'title' => $data['title'],
+                'description' => $data['description'],
+                'category' => $data['category'],
+                'user_id' => $authUser->id
+
+            ]);
+            $authUser->files()->attach($file);
+            return redirect()->route('admin.contacts.dashboard')->with('success', 'File Uploaded Successfully');
+        }
     }
 
     /**

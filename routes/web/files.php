@@ -7,3 +7,4 @@ use App\Http\Controllers\Admin\Files\FilesController;
 
 
 Route::get('/', [FilesController::class, 'index'])->name('dashboard');
+Route::post('/send/{user}', [FilesController::class, 'store'])->name('store');

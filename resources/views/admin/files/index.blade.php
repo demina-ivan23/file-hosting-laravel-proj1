@@ -20,7 +20,6 @@
                   Actions
                 </button>
                 <ul class="dropdown-menu">
-                  <li><a class="dropdown-item" href="{{ route('admin.contacts.create')}}">Create New Contact</a></li>
                   <li><a class="dropdown-item" href="#">Something else here</a></li>
                 </ul>
               </div>

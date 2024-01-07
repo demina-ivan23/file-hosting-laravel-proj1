@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
 use App\Services\UserContactService;
+use Illuminate\Support\Facades\Gate;
 use App\Http\Requests\UserContacts\StoreUserContactRequest;
 
 class UserContactController extends Controller
@@ -48,7 +49,14 @@ class UserContactController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $userToSendTo = User::find($id);
+        $userSending = User::find(auth()->id());
+        if(Gate::allows('start-chat', [$userToSendTo, $userSending])){
+           return view('admin.contacts.show', ['contact_user' => $userToSendTo]);
+        }
+        else{
+           abort(403);
+        }
     }
 
     /**

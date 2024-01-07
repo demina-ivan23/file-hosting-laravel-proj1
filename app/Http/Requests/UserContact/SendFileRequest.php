@@ -22,7 +22,7 @@ class SendFileRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => 'nullable|max:225',
+            'title' => 'required|max:225',
             'description' => 'nullable|max:225',
             'category' => 'nullable|max:25',
             'file' => 'required|mimes:jpg,img,jpeg,png,wmv,mp3,mp4,avi,mpeg'
