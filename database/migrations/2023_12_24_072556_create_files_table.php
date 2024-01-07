@@ -17,9 +17,15 @@ return new class extends Migration
             $table->string('title')->nullable();  
             $table->string('description')->nullable();  
             $table->string('category')->nullable();
-            $table->unsignedBigInteger('user_id');
-            $table->index('user_id');
-            $table->foreign('user_id')
+            $table->unsignedBigInteger('sender_id');
+            $table->index('sender_id');
+            $table->foreign('sender_id')
+            ->references('id')
+            ->on('users')
+            ->onDelete('CASCADE');
+            $table->unsignedBigInteger('reciever_id');
+            $table->index('reciever_id');
+            $table->foreign('reciever_id')
             ->references('id')
             ->on('users')
             ->onDelete('CASCADE');

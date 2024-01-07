@@ -17,7 +17,8 @@ class FilesController extends Controller
     public function index()
     { 
         $authUser = User::find(auth()->user()->id);
-        $files = $authUser->files()->latest()->get();
+        $files = $authUser->recievedFiles()->latest()->get()->merge($authUser->sentFiles()->latest()->get());
+
         
         return view('admin.files.index', ['files' => $files]);
     }
@@ -33,10 +34,11 @@ class FilesController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request, $user)
     {
         $authUser = User::find(auth()->user()->id);
         $data = $request->all();
+        $userReciever = User::find($user);
         if($request->hasFile('file'))
         {
             $fileloader = new FileUploadService();
@@ -46,10 +48,11 @@ class FilesController extends Controller
                 'title' => $data['title'],
                 'description' => $data['description'],
                 'category' => $data['category'],
-                'user_id' => $authUser->id
-
+                'sender_id' => $authUser->id,
+                'reciever_id' => $userReciever->id
             ]);
-            $authUser->files()->attach($file);
+            $authUser->sentFiles()->attach($file, ['userReciever' => $userReciever->id]);
+
             return redirect()->route('admin.contacts.dashboard')->with('success', 'File Uploaded Successfully');
         }
     }
@@ -59,12 +62,12 @@ class FilesController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $file = File::find($id);
+        $file_path = public_path('storage\\' . $file->path);
+        $file_path = str_replace('/', DIRECTORY_SEPARATOR, $file_path); 
+        return response()->download($file_path);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(string $id)
     {
         //

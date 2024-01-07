@@ -13,12 +13,21 @@ return new class extends Migration
     {
         Schema::create('file_user', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user');
-            $table->index('user');
-            $table->foreign('user')
+            $table->unsignedBigInteger('userSender');
+            $table->index('userSender');
+            $table->foreign('userSender')
             ->references('id')
             ->on('users')
             ->onDelete('CASCADE');
+
+            
+            $table->unsignedBigInteger('userReciever');
+            $table->index('userReciever');
+            $table->foreign('userReciever')
+            ->references('id')
+            ->on('users')
+            ->onDelete('CASCADE');
+
 
             $table->unsignedBigInteger('file');
             $table->index('file');

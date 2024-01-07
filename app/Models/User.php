@@ -48,8 +48,14 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(User::class, 'user_user', 'user_id_1', 'user_id_2')->withTimestamps();
     }
-    public function files()
+    public function sentFiles()
     {
-        return $this->belongsToMany(File::class, 'file_user', 'user', 'file' );
+        return $this->belongsToMany(File::class, 'file_user', 'userSender', 'file' )
+        ->withPivot(['userReciever']);
+    }
+    public function recievedFiles()
+    {
+        return $this->belongsToMany(File::class, 'file_user', 'userReciever', 'file' )
+        ->withPivot(['userSender']);
     }
 }
