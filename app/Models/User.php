@@ -51,11 +51,18 @@ class User extends Authenticatable
     public function sentFiles()
     {
         return $this->belongsToMany(File::class, 'file_user', 'userSender', 'file' )
-        ->withPivot(['userReciever']);
+        ->withPivot(['userReceiver']);
     }
-    public function recievedFiles()
+    public function receivedFiles()
     {
-        return $this->belongsToMany(File::class, 'file_user', 'userReciever', 'file' )
+        return $this->belongsToMany(File::class, 'file_user', 'userReceiver', 'file' )
         ->withPivot(['userSender']);
     }
+
+    public function messages()
+    {
+        return $this->belongsToMany(Message::class, 'message_user', 'userReceiver', 'message');
+    }
+
+    
 }

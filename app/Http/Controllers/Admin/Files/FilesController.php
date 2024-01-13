@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use App\Services\FileUploadService;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Gate;
 
 
 class FilesController extends Controller
@@ -17,7 +18,15 @@ class FilesController extends Controller
     public function index()
     { 
         $authUser = User::find(auth()->user()->id);
-        $files = $authUser->recievedFiles()->latest()->get()->merge($authUser->sentFiles()->latest()->get());
+        $files = File::where(function ($query) {
+            $query->where('sender_id', auth()->id());
+        })
+        ->orWhere(function ($query) {
+            $query->where('receiver_id', auth()->id());
+        })
+        ->filter() 
+        ->latest()
+        ->get();
 
         
         return view('admin.files.index', ['files' => $files]);
@@ -26,9 +35,16 @@ class FilesController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create($id)
     {
-        //
+        $userToSendTo = User::find($id);
+        $userSending = User::find(auth()->id());
+        if(Gate::allows('start-chat', [$userToSendTo, $userSending])){
+           return view('admin.files.create', ['contact_user' => $userToSendTo]);
+        }
+        else{
+           abort(403, "You Are Not Allowed To Send Anything To This User. This May Be Due To Several Reasons. 1 - You May Be Blocked By This User. 2 - This User May Not Have You As A Contact.");
+        }
     }
 
     /**
@@ -49,9 +65,9 @@ class FilesController extends Controller
                 'description' => $data['description'],
                 'category' => $data['category'],
                 'sender_id' => $authUser->id,
-                'reciever_id' => $userReciever->id
+                'receiver_id' => $userReciever->id
             ]);
-            $authUser->sentFiles()->attach($file, ['userReciever' => $userReciever->id]);
+            $authUser->sentFiles()->attach($file, ['userReceiver' => $userReciever->id]);
 
             return redirect()->route('admin.contacts.dashboard')->with('success', 'File Uploaded Successfully');
         }

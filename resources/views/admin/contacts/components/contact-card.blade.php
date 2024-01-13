@@ -16,7 +16,8 @@
                         Actions
                     </button>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="{{ route('admin.contacts.show', ['user' => $contact->id])}}">Send A File</a></li>
+                        <li><a class="dropdown-item" href="{{ route('admin.files.create', ['user' => $contact->id])}}">Send A File</a></li>
+                        <li><a class="dropdown-item" href="{{ route('admin.contacts.show', ['user' => $contact->id])}}">Show Files Related To This Contact</a></li>
                         <li><a class="dropdown-item" href="#">Block User</a></li>
                         <li><a class="dropdown-item" href="#">Delete Contact</a></li>
                         <li><a class="dropdown-item" href="#">Something else here</a></li>

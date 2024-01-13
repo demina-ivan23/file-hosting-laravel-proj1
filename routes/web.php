@@ -25,3 +25,5 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 Route::prefix('/contacts')->middleware('auth')->name('admin.contacts.')->group(base_path('routes/web/contacts.php'));
 
 Route::prefix('/files')->middleware('auth')->name('admin.files.')->group(base_path('routes/web/files.php'));
+
+Route::prefix('/messages')->middleware('auth')->name('admin.messages.')->group(base_path('routes/web/messages.php'));

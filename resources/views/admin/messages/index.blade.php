@@ -9,7 +9,7 @@
     <div class="card mt-4">
         <div class="card-body">
           <div class="d-flex">
-            <h2>Contacts <small class="text-muted">Showing All Contacts</small></h2>
+            <h2>Messages <small class="text-muted">Showing All Messages</small></h2>
             <div class="ml-auto" style="margin-left: auto">
             
             </div>
@@ -30,9 +30,9 @@
         </div>
           </div>
 
-          @if ($contacts->count())
-          @foreach ($contacts as $contact)
-                  @include('admin.contacts.components.contact-card', ['contact' => $contact])     
+          @if ($messages->count())
+          @foreach ($messages as $message)
+                  @include('admin.messages.components.message-card', ['message' => $message])     
           @endforeach
           @endif
     

@@ -11,31 +11,24 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('file_user', function (Blueprint $table) {
+        Schema::create('messages', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('userSender');
+            $table->string('text');
+            $table->boolean('system')->default(false);
+            $table->unsignedBigInteger('userSender')->nullable();
             $table->index('userSender');
             $table->foreign('userSender')
             ->references('id')
             ->on('users')
-            ->onDelete('CASCADE');
+            ->onDelete('SET NULL');
 
-            
             $table->unsignedBigInteger('userReceiver');
             $table->index('userReceiver');
             $table->foreign('userReceiver')
             ->references('id')
             ->on('users')
             ->onDelete('CASCADE');
-
-
-            $table->unsignedBigInteger('file');
-            $table->index('file');
-            $table->foreign('file')
-            ->references('id')
-            ->on('files')
-            ->onDelete('CASCADE');
-
+            
             $table->timestamps();
         });
     }
@@ -45,6 +38,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('files_users');
+        Schema::dropIfExists('messages');
     }
 };

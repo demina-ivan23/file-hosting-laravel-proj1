@@ -1,74 +1,61 @@
 @extends('layouts.app')
-
 @section('content')
-    <div class="container">
-        <a href="{{route('admin.contacts.dashboard')}}" class="btn btn-light">Go Back To Contacts</a>
-        <div class="card mt-4">
-            <div class="card-body">
-                <div class="d-flex">
-
-                    <h2>Send A File To {{$contact_user->name}}</h2>
-                    
-                    <div class="ml-auto" style="margin-left: auto">
-                        <div class="dropdown">
-                            <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Actions
-                            </button>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="{{ route('admin.contacts.dashboard')}}">Dashboard</a></li>
-                                <li><a class="dropdown-item" href="#">Something else here</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
+<div class="container">
+  @if (session('success'))
+      <div class="alert alert-success">
+        {{ session('success') }}
+      </div>
+  @endif
+  <a href="{{route('admin.contacts.dashboard')}}" class="btn btn-light">Go Back To Contacts</a>
+    <div class="card mt-4">
+        <div class="card-body">
+          <div class="d-flex">
+            <h2>Files <small class="text-muted">Showing  Files Related To {{$contact->name}}</small></h2>
+            <div class="ml-auto" style="margin-left: auto">
+            
             </div>
-
-            <hr>
-            @if ($errors->count())
-                
-            <div class="alert alert-danger">
-               <ul>
-                @foreach ($errors->all() as $message)
-               
-                <li>{{ $message }}</li>
-                @endforeach
-               </ul>
-            </div>
-            @endif
-            <form action="{{ route('admin.files.store', ['user' => $contact_user->id]) }}" method="POST" enctype="multipart/form-data">
-                @csrf
-
-<div class="p-3">
-
-    <div class="mb-3">
-        <label for="name" class="form-label">Add A Title</label>
-        <input class="form-control" type="text" name="title" id="title" placeholder="Title...">
-    </div>
-    
-    <div class="mb-3">
+            <div class="ml-auto" style="margin-left: auto">
         
-        <label for="email" class="form-label">Add A Description</label>
-        <input class="form-control" type="text" name="description" id="description" placeholder="No description yet...">
-    </div>
-    <div class="mb-3">
-        <label for="category" class="form-label">Add A Category</label>
-        <input class="form-control" type="text" name="category" id="category" placeholder="Category...">
-    </div>
-    <div class="mb-3">
-        <label for="file" class="form-label">Add A File</label>
-        <input class="form-control" type="file" name="file" id="file">
-    </div>
-        <button class="btn btn-primary float-end mb-2" type="submit">
-            Send
-        </button>
+              <div class="dropdown">
+                <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  Actions
+                </button>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item" href="#">Something else here</a></li>
+                </ul>
+              </div>
+            </div>
+            <div class="ml-auto" style="margin-left: auto">
+        
+              <div class="dropdown">
+                <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  Filter
+                </button>
+                <ul class="dropdown-menu">
+                  <form action="#" method="GET">
+                    <li><button class="dropdown-item" name="filter_sent_files" id="filter_sent_files" type="submit" value="{{$contact->id}}">Show Sent Files</button></li>
+                  </form>
+                  <form action="#" method="GET">
+                    <li><button class="dropdown-item" name="filter_received_files" id="filter_received_files" type="submit" value="{{$contact->id}}">Show Received Files</button></li>
+                  </form>
+                  <form action="#" method="GET">
+                    <li><a class="dropdown-item" href="{{route('admin.contacts.show', ['user' => $contact->id])}}">Show All Files</a></li>
+                  </form>
+                  <li><a class="dropdown-item" href="#">Something else here</a></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+          </div>
 
-    </div>
+           @if ($files)
+          @foreach ($files as $file)
+                  @include('admin.files.components.file-card', ['file' => $file])     
+          @endforeach
+          @endif 
+          
+    
 </div>
 
-</div>
-</form>
-
-
-</div>
-</div>
 @endsection

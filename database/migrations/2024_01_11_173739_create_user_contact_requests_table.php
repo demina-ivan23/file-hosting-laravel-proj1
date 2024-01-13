@@ -11,12 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('files', function (Blueprint $table) {
+        Schema::create('user_contact_requests', function (Blueprint $table) {
             $table->id();
-            $table->string('path');
-            $table->string('title')->nullable();  
-            $table->string('description')->nullable();  
-            $table->string('category')->nullable();
             $table->unsignedBigInteger('sender_id');
             $table->index('sender_id');
             $table->foreign('sender_id')
@@ -38,6 +34,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('files');
+        Schema::dropIfExists('user_contact_requests');
     }
 };

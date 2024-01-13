@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers\Admin\UserContact;
 
+use App\Models\File;
 use App\Models\User;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 
+use App\Http\Controllers\Controller;
 use App\Services\UserContactService;
 use Illuminate\Support\Facades\Gate;
 use App\Http\Requests\UserContacts\StoreUserContactRequest;
@@ -49,14 +50,32 @@ class UserContactController extends Controller
      */
     public function show(string $id)
     {
-        $userToSendTo = User::find($id);
-        $userSending = User::find(auth()->id());
-        if(Gate::allows('start-chat', [$userToSendTo, $userSending])){
-           return view('admin.contacts.show', ['contact_user' => $userToSendTo]);
+        $contact = User::find($id);
+        $authUser = auth()->user();
+    
+        if(!$contact)
+        {
+            abort(404);
         }
-        else{
-           abort(403);
+        if(!$contact->contacts->contains($authUser))
+        {
+            abort(403);
         }
+        if(!$contact->receivedFiles->where('sender', auth()->user())->count() && !$contact->sentFiles->where('receiver', auth()->user())->count()){
+            abort(403, 'No Files Related To The User Found');
+        }
+        $files = File::where(function ($query) use ($contact) {
+            $query->where('sender_id', auth()->id())
+                ->where('receiver_id', $contact->id);
+        })
+        ->orWhere(function ($query) use ($contact) {
+            $query->where('sender_id', $contact->id)
+                ->where('receiver_id', auth()->id());
+        })
+        ->filter() 
+        ->latest()
+        ->get();
+       return view('admin.contacts.show', ['contact' => $contact, 'files' => $files]);
     }
 
     /**

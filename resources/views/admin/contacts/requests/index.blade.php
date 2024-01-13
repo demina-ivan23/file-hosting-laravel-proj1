@@ -9,7 +9,7 @@
     <div class="card mt-4">
         <div class="card-body">
           <div class="d-flex">
-            <h2>Contacts <small class="text-muted">Showing All Contacts</small></h2>
+            <h2>Requests <small class="text-muted">Showing All Contact Requests</small></h2>
             <div class="ml-auto" style="margin-left: auto">
             
             </div>
@@ -21,7 +21,7 @@
                 </button>
                 <ul class="dropdown-menu">
                   <li><a class="dropdown-item" href="{{ route('admin.contacts.requests.create')}}">Send A Contact Request</a></li>
-                  <li><a class="dropdown-item" href="{{ route('admin.contacts.requests.dashboard')}}">Show Contact Requests</a></li>
+                  <li><a class="dropdown-item" href="{{ route('admin.contacts.dashboard')}}">Go Back To Contacts</a></li>
                   <li><a class="dropdown-item" href="#">Something else here</a></li>
                 </ul>
               </div>
@@ -30,9 +30,9 @@
         </div>
           </div>
 
-          @if ($contacts->count())
-          @foreach ($contacts as $contact)
-                  @include('admin.contacts.components.contact-card', ['contact' => $contact])     
+          @if ($requests->count())
+          @foreach ($requests as $request)
+                  @include('admin.contacts.requests.components.request-card', ['request' => $request])     
           @endforeach
           @endif
     

@@ -27,7 +27,7 @@
           </div>
         </div>
       </div>
-      <form action="{{ route('admin.contacts.store')}}" method="POST" enctype="multipart/form-data">
+      <form action="{{ route('admin.contacts.requests.store')}}" method="POST" enctype="multipart/form-data">
         @csrf
       <div class="p-3">
   
@@ -37,7 +37,7 @@
           </div>
         
           <button class="btn btn-primary float-end mb-2" type="submit">
-            Create Contact
+            Send contact Request
         </button>
       </div>
     </form>
