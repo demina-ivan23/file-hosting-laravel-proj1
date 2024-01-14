@@ -35,7 +35,7 @@
                </ul>
             </div>
             @endif
-            <form action="{{ route('admin.files.store', ['user' => $contact_user->id]) }}" method="POST" enctype="multipart/form-data">
+            <form action="{{ route('admin.files.store', ['user' => $contact_user->id]) }}" method="POST" enctype="multipart/form-data" id="file-sending-form" @submit.prevent="submitFiles">
                 @csrf
 
 <div class="p-3">
@@ -55,8 +55,8 @@
         <input class="form-control" type="text" name="category" id="category" placeholder="Category...">
     </div>
     <div class="mb-3">
-        <label for="file" class="form-label">Add A File</label>
-        <input class="form-control" type="file" name="file" id="file">
+        <label for="file" class="form-label">Select Files</label>
+        <input class="form-control" type="file" name="files" id="files" multiple>
     </div>
         <button class="btn btn-primary float-end mb-2" type="submit">
             Send
