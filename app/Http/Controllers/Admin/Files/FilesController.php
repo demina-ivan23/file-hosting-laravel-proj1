@@ -55,10 +55,11 @@ class FilesController extends Controller
         $authUser = User::find(auth()->user()->id);
         $data = $request->all();
         $userReciever = User::find($user);
-        if($request->hasFile('file'))
+        if($request->hasFile('files'))
         {
+            // ddd($data['files']);
             $fileloader = new FileUploadService();
-            $path = $fileloader->UploadFile($request->file('file'));
+            $path = $fileloader->UploadFile($request->file('files'));
             $file = File::create([
                 'path' => $path,
                 'title' => $data['title'],
@@ -80,7 +81,7 @@ class FilesController extends Controller
     {
         $file = File::find($id);
         $file_path = public_path('storage\\' . $file->path);
-        $file_path = str_replace('/', DIRECTORY_SEPARATOR, $file_path); 
+        $file_path = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $file_path); 
         return response()->download($file_path);
     }
 

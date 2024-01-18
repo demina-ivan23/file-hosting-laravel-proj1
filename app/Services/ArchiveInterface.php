@@ -4,5 +4,6 @@ namespace App\Services;
 
 interface ArchiveInterface
 {
-  public function makeArchive($files, $archive_name);
+  public function __construct(FileUploadService $fileUploader);
+  public function makeArchive( array $files, ?string $archive_name);
 }

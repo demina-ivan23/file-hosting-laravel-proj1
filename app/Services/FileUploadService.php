@@ -8,7 +8,8 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
 
-class FileUploadService{
+class FileUploadService
+{
     public function UploadFile(UploadedFile $file, $disk = 'public', $filename = null)
     {
         $FileName = !is_null($filename) ? $filename : Str::random(10);
@@ -17,6 +18,17 @@ class FileUploadService{
             $FileName . "." . $file->getClientOriginalExtension(),
             $disk
         );
+    }
+    public function moveUploadedFile($sourcePath, $destinationDirectory)
+    {
+        // Generate a unique name for the file within the destination directory
+        $destinationFileName = uniqid() . '_archive.zip';
+
+        // Move the file to the desired directory within storage
+        Storage::move($sourcePath, $destinationDirectory . '/' . $destinationFileName);
+
+        // Return the path to the moved file
+        return $destinationDirectory . '/' . $destinationFileName;
     }
 
     public function deleteFile($path, $disk = 'public')

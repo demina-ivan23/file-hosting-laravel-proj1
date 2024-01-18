@@ -35,7 +35,7 @@
                </ul>
             </div>
             @endif
-            <form action="{{ route('admin.files.store', ['user' => $contact_user->id]) }}" method="POST" enctype="multipart/form-data" id="file-sending-form" @submit.prevent="submitFiles">
+            <form action="{{ route('admin.files.store', ['user' => $contact_user->id]) }}" method="POST" enctype="multipart/form-data" id="file-sending-form" @submit.prevent="handleFormSubmit">
                 @csrf
 
 <div class="p-3">
@@ -56,16 +56,23 @@
     </div>
     <div class="mb-3">
         <label for="file" class="form-label">Select Files</label>
-        <input class="form-control" type="file" name="files" id="files" multiple>
+        <input class="form-control" type="file" name="files[]" id="files" multiple @change="toggleFileFormatDropdown">
     </div>
-        <button class="btn btn-primary float-end mb-2" type="submit">
+    <div class="mb-3" v-if="showFileFormatDropdown">
+        <label for="fileFormat" class="form-label">Select File Format</label>
+        <select class="form-control" name="fileCompressionFormat" id="fileCompressionFormat">
+            <option value="none">none</option>
+            <option value="zip">zip</option>
+            <option value="tar">tar (.tar)</option>
+
+        </select>
+    </div>
+        <button class="btn btn-primary float-end mb-2" type="submit" id="formSubmit" @click="handleFormSubmit">
             Send
         </button>
 
     </div>
-</div>
 
-</div>
 </form>
 
 

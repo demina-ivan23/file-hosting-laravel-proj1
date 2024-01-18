@@ -13,7 +13,49 @@ import { createApp } from 'vue';
  * to use in your application's views. An example is included for you.
  */
 
-const app = createApp({});
+ const app = createApp({
+    data() {
+        return {
+            showFileFormatDropdown: false,
+        };
+    },
+    methods: {
+        toggleFileFormatDropdown(event) {
+            this.showFileFormatDropdown = event.target.files.length > 1;
+        },
+        handleFormSubmit(event) {
+            event.preventDefault();
+
+            const form = document.getElementById('file-sending-form');
+
+            if (form !== undefined && form !== null) {
+                const filesInput = document.querySelector('#files');
+
+                if (filesInput.files.length == 1) {
+                    form.action = "http://localhost:8000/files/send/32";
+                    form.submit();
+                } else if (filesInput.files.length > 1) {
+                    const fileCompressionFormat = document.getElementById('fileCompressionFormat').value;
+
+                    if (fileCompressionFormat === "none") {
+                        const confirmed = confirm("You chose no compression format, so your files won't be sent as an archive but separately. Still proceed?");
+                        if (confirmed) {
+                            // Continue with form submission
+                            form.action = "http://localhost:8000/files/multiple/send/32";
+                            form.submit();
+                        }
+                    } else  {
+                        form.action = "http://localhost:8000/files/multiple/send/32";
+
+                        form.submit();
+                    }
+                }
+            }
+        },
+    },
+});
+
+
 
 import ExampleComponent from './components/ExampleComponent.vue';
 app.component('example-component', ExampleComponent);

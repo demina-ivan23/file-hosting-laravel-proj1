@@ -36,7 +36,8 @@ class UserContactRequestController extends Controller
         $data = $request->all();
         $receiver = User::find($data['id']);
         // ddd($receiver);
-        if(!$receiver){
+        if(!$receiver)
+        {
          abort(403, "No User With Id Of {$data['id']}");
         }
         $sender = User::find(auth()->id());
@@ -44,8 +45,13 @@ class UserContactRequestController extends Controller
             'sender_id' => $sender->id,
             'receiver_id' => $receiver->id
         ])->first();
-    if($contact_request){
+    if($contact_request)
+    {
         abort(403, 'You Have Already Sent A Request To This User');
+    }
+    if($sender->id === $receiver->id)
+    {
+        abort(403, 'You Are Already In Your Contact List :) XD');
     }
     if($receiver->contacts->contains($sender))
     {
