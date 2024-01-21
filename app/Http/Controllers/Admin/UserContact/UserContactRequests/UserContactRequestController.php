@@ -44,19 +44,23 @@ class UserContactRequestController extends Controller
         $contact_request = UserContactRequest::where([
             'sender_id' => $sender->id,
             'receiver_id' => $receiver->id
-        ])->first();
-    if($contact_request)
-    {
-        abort(403, 'You Have Already Sent A Request To This User');
-    }
-    if($sender->id === $receiver->id)
-    {
-        abort(403, 'You Are Already In Your Contact List :) XD');
-    }
-    if($receiver->contacts->contains($sender))
-    {
-        abort(403, 'You Are Already In The User\'s Contact List');
-    }
+            ])->first();
+            if($contact_request)
+            {
+                abort(403, 'You Have Already Sent A Request To This User');
+            }
+            if($sender->id === $receiver->id)
+            {
+                abort(403, 'You Are Already In Your Contact List :) XD');
+            }
+            if($receiver->contacts->contains($sender))
+            {
+                abort(403, 'You Are Already In The User\'s Contact List');
+            }
+            if($receiver->blacklist->contains($sender->id) || $sender->blacklist->contains)
+            {
+                abort(403, 'You Have Either Blocked This User Or Have Been Blocked By Them (Or Both). Unblock Them To Send A Request Or Ask Them To Unblock You (Depends On Who Blocked Whom)');
+            }
     $contact_request = UserContactRequest::where([
         'sender_id' => $receiver->id,
         'receiver_id' => $sender->id

@@ -8,7 +8,10 @@
                         
                         
                         <h6> {{$file->path}}</h6>
-                        
+                        <div>
+
+                            <a class="btn btn-outline-primary" href="{{route('admin.files.show', ['file' => $file->id])}}">Download</a>
+                        </div>
                         
                     </div>
                 
@@ -56,9 +59,6 @@
             </div>
             
             <div class="col-sm-2 d-flex justify-content-center align-items-center">
-                <a class="btn btn-outline-primary" href="{{route('admin.files.show', ['file' => $file->id])}}">Download</a>
-            </div>
-            <div class="col-sm-2 d-flex justify-content-center align-items-center">
                 <form action="{{ route('admin.files.personal.store') }}" method="POST">
                     @csrf
 
@@ -67,10 +67,29 @@
                     <input type="hidden" name="title" value="{{ $file->title }}">
                     <input type="hidden" name="description" value="{{ $file->description }}">
                     <input type="hidden" name="category" value="{{ $file->category }}">
-                
+                    
                     <button class="btn btn-outline-primary" type="submit">Save To Personal</button>
                 </form>
             </div>
+                @if ($file->sender->id === auth()->id())
+                <div  class="col-sm-2 d-flex justify-content-center align-items-center">
+                    <form action="{{route('admin.files.delete', ['id' => $file->id])}}" method="POST">
+                        @csrf
+                        @method('DELETE')
+                        <button class="btn btn-outline-danger" type="submit" onclick="return confirm('Do You Want To Delete This File? It Will Also Be Deleted For The Receiver')">Delete</button>
+                    </form>
+                </div>
+                    
+                @else
+                <div  class="col-sm-2 d-flex justify-content-center align-items-center">
+                    <form action="{{route('admin.files.delete', ['id' => $file->id])}}" method="POST">
+                        @csrf
+                        @method('DELETE')
+                        <button class="btn btn-outline-danger" type="submit" onclick="return confirm('Do You Want To Deleter This File? It Will Also Be Deleted For The File\'s Sender.')">Delete</button>
+                    </form>
+                </div>
+                @endif
+
         </div>
     </div>
 </div>

@@ -30,8 +30,15 @@
               
             </div>
             
-            <div class="col-sm-4 d-flex justify-content-center align-items-center">
+            <div class="col-sm-2 d-flex justify-content-center align-items-center">
                 <a class="btn btn-outline-primary" href="{{route('admin.files.show', ['file' => $file->id])}}">Download</a>
+            </div>
+            <div  class="col-sm-2 d-flex justify-content-center align-items-center">
+                <form action="{{route('admin.files.delete', ['id' => $file->id])}}" method="POST">
+                    @csrf
+                    @method('DELETE')
+                    <button class="btn btn-outline-danger" type="submit" onclick="return confirm('Do You Want To Delete This Personal File?')">Delete</button>
+                </form>
             </div>
         </div>
     </div>

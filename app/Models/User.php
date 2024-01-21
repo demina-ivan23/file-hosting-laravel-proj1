@@ -64,5 +64,9 @@ class User extends Authenticatable
         return $this->belongsToMany(Message::class, 'message_user', 'userReceiver', 'message');
     }
 
+    public function blacklist()
+    {
+        return $this->belongsToMany(User::class, 'user_blacklist', 'blocker_id', 'blocked_user_id');
+    }
     
 }

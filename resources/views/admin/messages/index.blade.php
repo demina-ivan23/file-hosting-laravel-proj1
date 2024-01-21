@@ -6,6 +6,11 @@
         {{ session('success') }}
       </div>
   @endif
+  @if (session('error'))
+  <div class="alert alert-danger">
+    {{ session('error') }}
+  </div>
+@endif
     <div class="card mt-4">
         <div class="card-body">
           <div class="d-flex">
@@ -20,8 +25,15 @@
                   Actions
                 </button>
                 <ul class="dropdown-menu">
-                  <li><a class="dropdown-item" href="{{ route('admin.contacts.requests.create')}}">Send A Contact Request</a></li>
-                  <li><a class="dropdown-item" href="{{ route('admin.contacts.requests.dashboard')}}">Show Contact Requests</a></li>
+                  <li><a class="dropdown-item" href="{{route('admin.messages.multiple.index')}}">Delete Multiple Messages</a></li>
+                  <li>
+                    <form action="{{route('admin.messages.multiple.delete')}}" method="POST">
+                      @csrf
+                      @method('DELETE')
+                      {{-- <input type="hidden" name="delete_messages[]" value='all'> --}}
+                      <button class="dropdown-item" type="submit" value="all" name="delete_messages" onclick="return confirm('Do You Want To Delete All Messages?')">Delete All Messages</button>
+                    </form>
+                  </li>
                   <li><a class="dropdown-item" href="#">Something else here</a></li>
                 </ul>
               </div>

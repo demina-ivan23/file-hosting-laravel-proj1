@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers\Admin\Files;
 
+use App\Services\FileService;
 use App\Models\File;
-use App\Models\User;
+use App\Models\Message;
 use Illuminate\Http\Request;
 use App\Services\FileUploadService;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Gate;
+
 
 
 class FilesController extends Controller
@@ -17,18 +18,7 @@ class FilesController extends Controller
      */
     public function index()
     { 
-        $authUser = User::find(auth()->user()->id);
-        $files = File::where(function ($query) {
-            $query->where('sender_id', auth()->id());
-        })
-        ->orWhere(function ($query) {
-            $query->where('receiver_id', auth()->id());
-        })
-        ->filter() 
-        ->latest()
-        ->get();
-
-        
+       $files = FileService::getAllFiles();
         return view('admin.files.index', ['files' => $files]);
     }
 
@@ -37,14 +27,7 @@ class FilesController extends Controller
      */
     public function create($id)
     {
-        $userToSendTo = User::find($id);
-        $userSending = User::find(auth()->id());
-        if(Gate::allows('start-chat', [$userToSendTo, $userSending])){
-           return view('admin.files.create', ['contact_user' => $userToSendTo]);
-        }
-        else{
-           abort(403, "You Are Not Allowed To Send Anything To This User. This May Be Due To Several Reasons. 1 - You May Be Blocked By This User. 2 - This User May Not Have You As A Contact.");
-        }
+        FileService::createFiles($id);
     }
 
     /**
@@ -52,26 +35,7 @@ class FilesController extends Controller
      */
     public function store(Request $request, $user)
     {
-        $authUser = User::find(auth()->user()->id);
-        $data = $request->all();
-        $userReciever = User::find($user);
-        if($request->hasFile('files'))
-        {
-            // ddd($data['files']);
-            $fileloader = new FileUploadService();
-            $path = $fileloader->UploadFile($request->file('files'));
-            $file = File::create([
-                'path' => $path,
-                'title' => $data['title'],
-                'description' => $data['description'],
-                'category' => $data['category'],
-                'sender_id' => $authUser->id,
-                'receiver_id' => $userReciever->id
-            ]);
-            $authUser->sentFiles()->attach($file, ['userReceiver' => $userReciever->id]);
-
-            return redirect()->route('admin.contacts.dashboard')->with('success', 'File Uploaded Successfully');
-        }
+        FileService::sendFile($request, $user);
     }
 
     /**
@@ -103,6 +67,70 @@ class FilesController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $file = File::find($id);
+        if(!$file){
+            abort(404);
+        }
+        $receiver = $file->receiver;
+        $sender = $file->sender;
+        if($file->sender->id === auth()->id() xor $file->receiver->id === auth()->id())
+        {
+            $fileloader = new FileUploadService();
+            $fileloader->deleteFile(str_replace( ['/', '\\'] ,DIRECTORY_SEPARATOR , $file->path));
+            $file->delete();
+            
+           
+            if($file->sender->id === auth()->id() && $file->receiver->id !== auth()->id())
+            {
+
+                $message_to_sender = Message::create([
+                    'text' => "You Deleted A File That Was Sent To $receiver->email By You",
+                    'system' => true,
+                    'userReceiver' => $sender->id
+                ]);
+                $message_to_receiver = Message::create([
+                    'text' => "User $sender->email Have Deleted The File They Sent You",
+                    'system' => true,
+                    'userReceiver' => $receiver->id
+                ]);
+            }
+
+            if($file->receiver->id === auth()->id() && $file->sender->id !== auth()->id())
+            {
+
+                $message_to_sender = Message::create([
+                    'text' => "User $receiver->email Have Deleted A File That Was Sent To Them By You",
+                    'system' => true,
+                    'userReceiver' => $sender->id
+                ]);
+                $message_to_receiver = Message::create([
+                    'text' => "You Have Deleted The File That Was Sent To You By $sender->email",
+                    'system' => true,
+                    'userReceiver' => $receiver->id
+                ]);
+            }
+            $receiver->messages()->attach($message_to_receiver);
+            $sender->messages()->attach($message_to_sender);
+            return redirect(route('admin.files.dashboard'))->with('success', 'File Deleted Successfully');
+        }
+        else if($file->receiver->id === auth()->id() && $file->sender->id === auth()->id())
+        {
+             
+            $fileloader = new FileUploadService();
+            $fileloader->deleteFile(str_replace( ['/', '\\'] ,DIRECTORY_SEPARATOR , $file->path));
+            $file->delete();
+            $message_to_yourself = Message::create([
+                'text' => 'You Have Deleted Your Personal File',
+                'system' => true,
+                'userReceiver' => $sender->id
+            ]);
+        $sender->messages()->attach($message_to_yourself);
+        return redirect(route('admin.files.personal.index'))->with('success', 'File Deleted Successfully');
+
+        }
+        
+        else{
+            abort(403, 'You Are Neither File\'s Sender Nor It\'s Receiver. But You Tried :)');
+        }
     }
 }

@@ -6,6 +6,11 @@
         {{ session('success') }}
       </div>
   @endif
+  @if (session('error'))
+  <div class="alert alert-danger">
+    {{ session('error') }}
+  </div>
+@endif
     <div class="card mt-4">
         <div class="card-body">
           <div class="d-flex">

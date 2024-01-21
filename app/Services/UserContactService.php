@@ -1,61 +1,173 @@
-<?php 
+<?php
 
 namespace App\Services;
 
 use Exception;
-use App\Models\User;
+use App\Models\File;
 
+use App\Models\User;
 use App\Models\Message;
 use App\Models\UserContactRequest;
 
-class UserContactService{
+class UserContactService
+{
     static function storeContact($request)
-    {     
-        $userToAdd = static::findUserToAdd($request->id);    
-        $authUser = User::find(auth()->user()->id);
-        
-        if (!$userToAdd) {
-            throw new Exception('User not found');
-        }
-        if(!$authUser->contacts->contains($userToAdd)){
+    {
+        $userToAdd = static::findUser($request->id);
+        $authUser = static::findUser(auth()->id());
 
-            try{
-                $authUser->contacts()->attach($userToAdd->id);
-                $userToAdd->contacts()->attach($authUser->id);
-                $contact_request = UserContactRequest::where([
-                    'sender_id' => $userToAdd->id,
-                    'receiver_id' => $authUser->id
-                ])->first();
-                if($contact_request){
-                    $contact_request->delete();
+        if (!$authUser->contacts->contains($userToAdd)) {
+
+            if (!$authUser->blacklist->contains($userToAdd) && !$userToAdd->blacklist->contains($userToAdd)) {
+
+                try {
+                    $authUser->contacts()->attach($userToAdd->id);
+                    $userToAdd->contacts()->attach($authUser->id);
+                    $contact_request = UserContactRequest::where([
+                        'sender_id' => $userToAdd->id,
+                        'receiver_id' => $authUser->id
+                    ])->first();
+                    if ($contact_request) {
+                        $contact_request->delete();
+                    }
+                    $message_to_receiver = Message::create([
+                        'text' => "Your Request To $authUser->email Had Been Accepted. You Are Now Contacts With $authUser->name",
+                        'system' => true,
+                        'userReceiver' => $userToAdd->id
+                    ]);
+                    $message_to_sender = Message::create([
+                        'text' => "You Successfully Accepted Contact Request Of $userToAdd->email. You Are Now Contacts With $userToAdd->name",
+                        'system' => true,
+                        'userReceiver' => $authUser->id
+                    ]);
+                    $userToAdd->messages()->attach($message_to_receiver);
+                    $authUser->messages()->attach($message_to_sender);
+                    return true;
+                } catch (Exception $e) {
+                    return $e->getMessage();
                 }
-                $message_to_receiver = Message::create([
-                    'text' => "Your Request To $authUser->email Had Been Accepted. You Are Now Contacts With $authUser->name",
-                    'userReceiver' => $userToAdd->id
-                ]);
-                $message_to_sender = Message::create([
-                    'text' => "You Successfully Accepted Contact Request Of $userToAdd->email. You Are Now Contacts With $userToAdd->name",
-                    'userReceiver' => $authUser->id
-                ]);
-        $userToAdd->messages()->attach($message_to_receiver);
-        $authUser->messages()->attach($message_to_sender);
-                return true;
-            } catch (Exception $e) {
-                return $e->getMessage();
+            } else {
+                abort(403, 'You Have Either Blocked This User Or Have Been Blocked By Them (Or Both). Unblock Them To Accept Their Request Or Ask Them To Unblock You (Depends On Who Blocked Whom)');
             }
-            
-        }
-        else{
+        } else {
             abort(403, 'You Already Have This User As A Contact');
         }
-
-
     }
-    static function findUserToAdd($id)
+    static function getRelatedFiles($id)
     {
+        try {
+            $contact = static::findUser($id);
+            $authUser = static::findUser(auth()->id());
+            if (!$contact->contacts->contains($authUser)) {
+                abort(403);
+            }
+            if (!$contact->receivedFiles->where('sender', auth()->user())->count() && !$contact->sentFiles->where('receiver', auth()->user())->count()) {
+                abort(403, 'No Files Related To The User Found');
+            }
+            $files = File::where(function ($query) use ($contact) {
+                $query->where('sender_id', auth()->id())
+                    ->where('receiver_id', $contact->id);
+            })
+                ->orWhere(function ($query) use ($contact) {
+                    $query->where('sender_id', $contact->id)
+                        ->where('receiver_id', auth()->id());
+                })
+                ->filter()
+                ->latest()
+                ->get();
+            return $files;
+        } catch (Exception $e) {
+            return $e->getMessage();
+        }
+    }
+
+    static function findUser($id)
+    {
+
         $userToAdd = User::find($id);
-        if ($userToAdd) {
-            return $userToAdd;
+        if (!$userToAdd) {
+            throw new Exception("User Not Found, Id: {$id}");
+        }
+        return $userToAdd;
+    }
+    static function getContacts()
+    {
+        $authUser = User::find(auth()->id());
+        return $authUser->contacts;
+    }
+    static function blockUser($request, $id)
+    {
+        try {
+            $authUser = static::findUser(auth()->id());
+            $contact = static::findUser($id);
+            if ($request['blocking']) {
+                if (!$authUser->blacklist->contains($id)) {
+                    $authUser->blacklist()->attach($id);
+                    $messageToAuth = Message::create([
+                        'text' => "You Have Blocked The User Who's Email is $contact->email",
+                        'system' => true,
+                        'userReceiver' => $authUser->id
+                    ]);
+                    $messageToBlockedContact = Message::create([
+                        'text' => "You Have Been Blocked By The User Who's Email is $authUser->email. Now You Can't Send Them Contact Requests, Files Or Messages",
+                        'system' => true,
+                        'userReceiver' => $contact->id
+                    ]);
+                    $authUser->messages()->attach($messageToAuth);
+                    $contact->messages()->attach($messageToBlockedContact);
+                    return redirect(route('admin.contacts.dashboard'))->with('success', "You Have Blocked The User $contact->email");
+                } else {
+                    abort(403, 'You Have Already Blocked The User');
+                }
+            } else if ($request['blocking'] == false) {
+                if ($authUser->blacklist->contains($id)) {
+                    $authUser->blacklist()->detach($id);
+                    $messageToAuth = Message::create([
+                        'text' => "You Have Unlocked The User Who's Email is $contact->email",
+                        'system' => true,
+                        'userReceiver' => $authUser->id
+                    ]);
+                    $messageToBlockedContact = Message::create([
+                        'text' => "You Have Been Unlocked By The User Who's Email is $authUser->email. Now You Can Send Them Contact Requests, Files Or Messages Again",
+                        'system' => true,
+                        'userReceiver' => $contact->id
+                    ]);
+                    $authUser->messages()->attach($messageToAuth);
+                    $contact->messages()->attach($messageToBlockedContact);
+                    return redirect(route('admin.contacts.dashboard'))->with('success', "You Have Unblocked The User $contact->email");
+                } else {
+                    abort(403, 'You Haven\'t Blocked The User Yet. But HOW In Hell Did You Get Here?! So curious :) ?');
+                }
+            } else {
+                abort(403, 'Wierd Action... This Shouldn\'t Appear To You. Pleas Contact The Support');
+            }
+        } catch (Exception $e) {
+            return $e->getMessage();
+        }
+    }
+    static function deleteContact($id)
+    {
+        try {
+
+            $authUser = static::findUser(auth()->id());
+            $contactUser = static::findUser($id);
+            $authUser->contacts()->detach($id);
+            $contactUser->contacts()->detach(auth()->id());
+            $messageToAuth = Message::create([
+                'text' => "You Have Deleted $contactUser->email. You Are Not Contacts Anymore",
+                'system' => true,
+                'userReceiver' => $authUser->id
+            ]);
+            $messageToContact = Message::create([
+                'text' => "You Have Been Deleted By $authUser->email. You Are Not Contacts Anymore",
+                'system' => true,
+                'userReceiver' => $contactUser->id
+            ]);
+            $authUser->messages()->attach($messageToAuth);
+            $contactUser->messages()->attach($messageToContact);
+            return redirect(route('admin.contacts.dashboard'))->with('success', 'Contact Deleted Successfully');
+        } catch (Exception $e) {
+            return $e->getMessage();
         }
     }
 }

@@ -2,13 +2,10 @@
 
 namespace App\Http\Controllers\Admin\UserContact;
 
-use App\Models\File;
-use App\Models\User;
-use Illuminate\Http\Request;
 
+use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Services\UserContactService;
-use Illuminate\Support\Facades\Gate;
 use App\Http\Requests\UserContacts\StoreUserContactRequest;
 
 class UserContactController extends Controller
@@ -18,8 +15,7 @@ class UserContactController extends Controller
      */
     public function index()
     {
-        $currentUser = User::find(auth()->user()->id); 
-        $contacts = $currentUser->contacts;
+        $contacts = UserContactService::getContacts();
         return view('admin.contacts.index', ['contacts' => $contacts]);
     }
 
@@ -50,32 +46,9 @@ class UserContactController extends Controller
      */
     public function show(string $id)
     {
-        $contact = User::find($id);
-        $authUser = auth()->user();
-    
-        if(!$contact)
-        {
-            abort(404);
-        }
-        if(!$contact->contacts->contains($authUser))
-        {
-            abort(403);
-        }
-        if(!$contact->receivedFiles->where('sender', auth()->user())->count() && !$contact->sentFiles->where('receiver', auth()->user())->count()){
-            abort(403, 'No Files Related To The User Found');
-        }
-        $files = File::where(function ($query) use ($contact) {
-            $query->where('sender_id', auth()->id())
-                ->where('receiver_id', $contact->id);
-        })
-        ->orWhere(function ($query) use ($contact) {
-            $query->where('sender_id', $contact->id)
-                ->where('receiver_id', auth()->id());
-        })
-        ->filter() 
-        ->latest()
-        ->get();
-       return view('admin.contacts.show', ['contact' => $contact, 'files' => $files]);
+     $contact = UserContactService::findUser($id);
+     $files = UserContactService::getRelatedFiles($id);
+     return view('admin.contacts.show', ['contact' => $contact, 'files' => $files]);
     }
 
     /**
@@ -91,14 +64,15 @@ class UserContactController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        UserContactService::blockUser($request, $id);
+
     }
 
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(string $id)
-    {
-        //
+    {   
+        UserContactService::deleteContact($id);
     }
 }

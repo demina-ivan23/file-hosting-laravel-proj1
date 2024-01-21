@@ -26,7 +26,15 @@ class AuthServiceProvider extends ServiceProvider
 
         Gate::define('start-chat', function ($userSending, $userToSendTo) {
             $contacts = $userToSendTo->contacts()->get();
-
+            // dd($userSending->id, $userToSendTo->id);
+            if($userSending->blacklist->contains($userToSendTo->id))
+            {
+                return false;
+            }
+            if($userToSendTo->blacklist->contains($userSending))
+            {
+                return false;
+            }
            return $contacts->contains('id', $userSending->id);
         });
     }

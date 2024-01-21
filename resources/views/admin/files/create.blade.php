@@ -6,7 +6,6 @@
         <div class="card mt-4">
             <div class="card-body">
                 <div class="d-flex">
-
                     <h2>Send A File To {{$contact_user->name}}</h2>
                     
                     <div class="ml-auto" style="margin-left: auto">
@@ -22,22 +21,23 @@
                     </div>
                 </div>
             </div>
-
+            
             <hr>
             @if ($errors->count())
-                
+            
             <div class="alert alert-danger">
-               <ul>
-                @foreach ($errors->all() as $message)
-               
-                <li>{{ $message }}</li>
-                @endforeach
-               </ul>
+                <ul>
+                    @foreach ($errors->all() as $message)
+                    
+                    <li>{{ $message }}</li>
+                    @endforeach
+                </ul>
             </div>
             @endif
             <form action="{{ route('admin.files.store', ['user' => $contact_user->id]) }}" method="POST" enctype="multipart/form-data" id="file-sending-form" @submit.prevent="handleFormSubmit">
                 @csrf
-
+                <input type="hidden" value="{{$contact_user->id}}" id="contact_user_id"> 
+                
 <div class="p-3">
 
     <div class="mb-3">

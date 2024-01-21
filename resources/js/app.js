@@ -30,9 +30,9 @@ import { createApp } from 'vue';
 
             if (form !== undefined && form !== null) {
                 const filesInput = document.querySelector('#files');
-
+const contact_user_id = document.getElementById('contact_user_id').value; 
                 if (filesInput.files.length == 1) {
-                    form.action = "http://localhost:8000/files/send/32";
+                    form.action = "http://localhost:8000/files/send/" + contact_user_id;
                     form.submit();
                 } else if (filesInput.files.length > 1) {
                     const fileCompressionFormat = document.getElementById('fileCompressionFormat').value;
@@ -41,11 +41,11 @@ import { createApp } from 'vue';
                         const confirmed = confirm("You chose no compression format, so your files won't be sent as an archive but separately. Still proceed?");
                         if (confirmed) {
                             // Continue with form submission
-                            form.action = "http://localhost:8000/files/multiple/send/32";
+                            form.action = "http://localhost:8000/files/multiple/send/" + contact_user_id;
                             form.submit();
                         }
                     } else  {
-                        form.action = "http://localhost:8000/files/multiple/send/32";
+                        form.action = "http://localhost:8000/files/multiple/send/" + contact_user_id;
 
                         form.submit();
                     }
