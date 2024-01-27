@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers\Admin\Files;
 
+use Carbon\Carbon;
 use App\Models\File;
 use App\Models\User;
+use App\Models\GlobalFile;
 use Illuminate\Http\Request;
 use App\Services\FileUploadService;
 use App\Http\Controllers\Controller;
+use App\Services\PersonalFileService;
 
 class PersonalFilesController extends Controller
 {
@@ -15,11 +18,7 @@ class PersonalFilesController extends Controller
      */
     public function index()
     {
-        $files = File::where(function ($query) {
-            $query->where('sender_id', auth()->id())
-                ->where('receiver_id', auth()->id());
-        })->latest()->get();
-   
+       $files = PersonalFileService::getAllPersonalFiles(auth()->id());
         return view('admin.files.personal.index', ['files' => $files]);
     }
 
@@ -36,48 +35,14 @@ class PersonalFilesController extends Controller
      */
     public function store(Request $request)
     {
-        $authUser = User::find(auth()->user()->id);
-        $data = $request->all();
-        if($request->hasFile('file'))
+        $result = PersonalFileService::storeFile($request);
+        if(str_contains($result, 'Successfully'))
         {
-            $fileloader = new FileUploadService();
-            $path = $fileloader->UploadFile($request->file('file'));
-            $file = File::create([
-                'path' => $path,
-                'title' => $data['title'],
-                'description' => $data['description'],
-                'category' => $data['category'],
-                'sender_id' => $authUser->id,
-                'receiver_id' => $authUser->id
-            ]);
-            $authUser->sentFiles()->attach($file, ['userReceiver' => $authUser->id]);
-                
-            return redirect()->route('admin.files.personal.index')->with('success', 'File Uploaded Successfully');
+            return redirect()->route('admin.files.personal.dashboard')->with('success', $result);
         }
-        if(array_key_exists('path', $data))
+        else
         {
-            if($data['path']){
-
-                $oldFile = File::where(['path' => $data['path']])->first();
-                if($oldFile->receiver->id !== $oldFile->sender->id)
-                {
-                    $oldFile->delete();
-                    $file = File::create([
-                        'path' => $data['path'],
-                        'title' => $data['title'],
-                        'description' => $data['description'],
-                        'category' => $data['category'],
-                        'sender_id' => $authUser->id,
-                        'receiver_id' => $authUser->id
-                    ]);
-                    $authUser->sentFiles()->attach($file, ['userReceiver' => $authUser->id]);
-                    
-                    return redirect()->route('admin.files.personal.index')->with('success', 'File Added Successfully');
-                }
-                else{
-                    abort(403, 'This File Is Already In Your Personal Files');
-                }
-            }
+            return redirect()->route('admin.files.personal.index')->with('error', $result);
         }
     }
 

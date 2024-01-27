@@ -46,9 +46,19 @@ class UserContactController extends Controller
      */
     public function show(string $id)
     {
-     $contact = UserContactService::findUser($id);
-     $files = UserContactService::getRelatedFiles($id);
-     return view('admin.contacts.show', ['contact' => $contact, 'files' => $files]);
+        $currentRoute = request()->route()->getName();
+        $contact = UserContactService::findUser($id);
+        if($currentRoute === 'admin.contacts.show'){
+            $files = UserContactService::getRelatedFiles($id);
+        }
+        if($currentRoute === 'admin.contacts.show.received')
+        {
+            $files= UserContactService::getReceivedFiles($id);
+        }
+        if($currentRoute === 'admin.contacts.show.sent'){
+            $files = UserContactService::getSentFiles($id);
+        }
+        return view('admin.contacts.show', ['contact' => $contact, 'files' => $files]);
     }
 
     /**
@@ -64,8 +74,16 @@ class UserContactController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        UserContactService::blockUser($request, $id);
+       $result = UserContactService::blockUser($request, $id);
 
+        
+    if (str_contains($result, 'Blocked')) {
+        return redirect()->route('admin.contacts.dashboard')->with('success', $result);
+    } elseif (str_contains($result, 'Unblocked')) {
+        return redirect()->route('admin.contacts.dashboard')->with('success', $result);
+    } else {
+        return redirect()->route('admin.contacts.dashboard')->with('error', $result);
+    }
     }
 
     /**
@@ -73,6 +91,13 @@ class UserContactController extends Controller
      */
     public function destroy(string $id)
     {   
-        UserContactService::deleteContact($id);
+        $result = UserContactService::deleteContact($id);
+        if(str_contains($result, 'Deleted Successfully')){
+            return redirect()->route('admin.contacts.deshboard')->with('success', $result);
+        }
+        else{
+            return redirect()->route('admin.contacts.dashboard')->with('error', $result);
+        }
+
     }
 }

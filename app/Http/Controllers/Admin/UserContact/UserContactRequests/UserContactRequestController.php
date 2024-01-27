@@ -7,6 +7,7 @@ use App\Models\Message;
 use Illuminate\Http\Request;
 use App\Models\UserContactRequest;
 use App\Http\Controllers\Controller;
+use App\Services\UserContactRequestService;
 
 class UserContactRequestController extends Controller
 {
@@ -15,8 +16,7 @@ class UserContactRequestController extends Controller
      */
     public function index()
     {
-        $requests = UserContactRequest::where(['sender_id' => auth()->id()])
-        ->orWhere(['receiver_id' => auth()->id()])->get();
+        $requests = UserContactRequestService::getAllRequests(auth()->id());
         return view('admin.contacts.requests.index', ['requests' => $requests]);
     }
 
@@ -33,58 +33,14 @@ class UserContactRequestController extends Controller
      */
     public function store(Request $request)
     {
-        $data = $request->all();
-        $receiver = User::find($data['id']);
-        // ddd($receiver);
-        if(!$receiver)
+        $result = UserContactRequestService::sendRequest($request);
+        if(str_contains($result, 'Sent Successfully'))
         {
-         abort(403, "No User With Id Of {$data['id']}");
+            return redirect()->route('admin.contacts.requests.dashboard')->with('success', $result);
         }
-        $sender = User::find(auth()->id());
-        $contact_request = UserContactRequest::where([
-            'sender_id' => $sender->id,
-            'receiver_id' => $receiver->id
-            ])->first();
-            if($contact_request)
-            {
-                abort(403, 'You Have Already Sent A Request To This User');
-            }
-            if($sender->id === $receiver->id)
-            {
-                abort(403, 'You Are Already In Your Contact List :) XD');
-            }
-            if($receiver->contacts->contains($sender))
-            {
-                abort(403, 'You Are Already In The User\'s Contact List');
-            }
-            if($receiver->blacklist->contains($sender->id) || $sender->blacklist->contains)
-            {
-                abort(403, 'You Have Either Blocked This User Or Have Been Blocked By Them (Or Both). Unblock Them To Send A Request Or Ask Them To Unblock You (Depends On Who Blocked Whom)');
-            }
-    $contact_request = UserContactRequest::where([
-        'sender_id' => $receiver->id,
-        'receiver_id' => $sender->id
-    ])->first();
-if($contact_request){
-    abort(403, 'This Person Have Already Sent You The Request. Check Your Requests Page');
-}
-        $contact_request = UserContactRequest::create([
-            'sender_id' => $sender->id,
-            'receiver_id' => $receiver->id
-        ]);
-        $message_to_receiver = Message::create([
-            'text' => "User With Email $sender->email Have Sent You A Contact Request. Check Your Requests Page",
-            'system' => true,
-            'userReceiver' => $receiver->id
-        ]);
-        $message_to_sender = Message::create([
-            'text' => "You Sent A Contact Request To User With Id Of $receiver->id",
-            'system' => true, 
-            'userReceiver' => $sender->id
-        ]);
-$receiver->messages()->attach($message_to_receiver);
-$sender->messages()->attach($message_to_sender);
-        return redirect(route('admin.contacts.requests.dashboard'))->with('success', 'Your Contact Request Was Sent Successfully');
+        else {
+            return redirect()->route('admin.contacts.requests.dashboard')->with('error', $result);
+        }
     }
 
     /**
@@ -116,38 +72,12 @@ $sender->messages()->attach($message_to_sender);
      */
     public function destroy(string $id, string $state)
     {
-        $contact_request = UserContactRequest::find($id);
-        if(!$contact_request){
-            abort(404, 'No Request Found');
+        $result = UserContactRequestService::deleteRequest($id, $state);
+        if(str_contains($result, 'Successfully')){
+            return redirect()->route('admin.contacts.requests.dashboard')->with('success', $result);
         }
-        if($state === 'canceled'){
-            $message_to_sender = Message::create([
-                'text' => "You Have Canceled The Request To The User With Id Of {$contact_request->receiver->id}",
-                'system' => true,
-                'userReceiver' => $contact_request->sender->id  
-            ]);
-            $sender = User::find($contact_request->sender->id);
-            $sender->messages()->attach($message_to_sender);
-            $contact_request->delete();
-            return redirect(route('admin.contacts.requests.dashboard'))->with('success', 'Request Canceled Successfully');
-        }
-        if($state === 'declined'){
-            $message_to_sender = Message::create([
-                'text' => "Your Request Was Denied By The User With Id Of {$contact_request->receiver->id}",
-                'system' => true,
-                'userReceiver' => $contact_request->sender->id  
-            ]);
-            $message_to_receiver = Message::create([
-                'text' => "You Have Denied The Request Of {$contact_request->sender->email}",
-                'system' => true,
-                'userReceiver' => $contact_request->receiver->id  
-            ]);
-            $sender = User::find($contact_request->sender->id);
-            $sender->messages()->attach($message_to_sender);
-            $receiver = User::find($contact_request->receiver->id);
-            $receiver->messages()->attach($message_to_receiver);
-            $contact_request->delete();
-            return redirect(route('admin.contacts.requests.dashboard'))->with('success', 'Request Declined Successfully');
+        else{
+            return redirect()->route('admin.contacts.requests.dashboard')->with('error', $result);
         }
     }
 }

@@ -61,9 +61,6 @@ class UserContactService
             if (!$contact->contacts->contains($authUser)) {
                 abort(403);
             }
-            if (!$contact->receivedFiles->where('sender', auth()->user())->count() && !$contact->sentFiles->where('receiver', auth()->user())->count()) {
-                abort(403, 'No Files Related To The User Found');
-            }
             $files = File::where(function ($query) use ($contact) {
                 $query->where('sender_id', auth()->id())
                     ->where('receiver_id', $contact->id);
@@ -74,7 +71,55 @@ class UserContactService
                 })
                 ->filter()
                 ->latest()
-                ->get();
+                ->paginate(10);
+            if ($files->isEmpty()) {
+                return [];
+            }
+            return $files;
+        } catch (Exception $e) {
+            return $e->getMessage();
+        }
+    }
+
+    static function getReceivedFiles($id){
+        try {
+            $contact = static::findUser($id);
+            $authUser = static::findUser(auth()->id());
+            if (!$contact->contacts->contains($authUser)) {
+                abort(403);
+            }
+            $files = File::where(function ($query) use ($contact) {
+                    $query->where('sender_id', $contact->id)
+                        ->where('receiver_id', auth()->id());
+                })
+                ->filter()
+                ->latest()
+                ->paginate(10);
+            if ($files->isEmpty()) {
+                return [];
+            }
+            return $files;
+        } catch (Exception $e) {
+            return $e->getMessage();
+        }
+    }
+    static function getSentFiles($id){
+        try {
+            $contact = static::findUser($id);
+            $authUser = static::findUser(auth()->id());
+            if (!$contact->contacts->contains($authUser)) {
+                abort(403);
+            }
+            $files = File::where(function ($query) use ($contact) {
+                    $query->where('sender_id', auth()->id())
+                        ->where('receiver_id', $contact->id);
+                })
+                ->filter()
+                ->latest()
+                ->paginate(10);
+            if ($files->isEmpty()) {
+                return [];
+            }
             return $files;
         } catch (Exception $e) {
             return $e->getMessage();
@@ -115,7 +160,7 @@ class UserContactService
                     ]);
                     $authUser->messages()->attach($messageToAuth);
                     $contact->messages()->attach($messageToBlockedContact);
-                    return redirect(route('admin.contacts.dashboard'))->with('success', "You Have Blocked The User $contact->email");
+                    return "You Have Blocked The User {$contact->email}";
                 } else {
                     abort(403, 'You Have Already Blocked The User');
                 }
@@ -134,9 +179,9 @@ class UserContactService
                     ]);
                     $authUser->messages()->attach($messageToAuth);
                     $contact->messages()->attach($messageToBlockedContact);
-                    return redirect(route('admin.contacts.dashboard'))->with('success', "You Have Unblocked The User $contact->email");
+                    return "You Have Unblocked The User {$contact->email}";
                 } else {
-                    abort(403, 'You Haven\'t Blocked The User Yet. But HOW In Hell Did You Get Here?! So curious :) ?');
+                    return 'You Haven\'t Blocked The User Yet. So curious :) ?';
                 }
             } else {
                 abort(403, 'Wierd Action... This Shouldn\'t Appear To You. Pleas Contact The Support');
@@ -165,7 +210,7 @@ class UserContactService
             ]);
             $authUser->messages()->attach($messageToAuth);
             $contactUser->messages()->attach($messageToContact);
-            return redirect(route('admin.contacts.dashboard'))->with('success', 'Contact Deleted Successfully');
+            return 'Contact Deleted Successfully';
         } catch (Exception $e) {
             return $e->getMessage();
         }

@@ -68,5 +68,12 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(User::class, 'user_blacklist', 'blocker_id', 'blocked_user_id');
     }
-    
+    public function ownedGlobalFiles()
+    {
+        return $this->belongsToMany(GlobalFile::class, 'global_file_owner', 'owner_id', 'global_file');
+    }
+    public function viewedGlobalFiles()
+    {
+        return $this->belongsToMany(GlobalFile::class, 'global_file_views', 'viewer_id', 'global_file');
+    }
 }

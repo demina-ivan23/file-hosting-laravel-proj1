@@ -9,7 +9,13 @@ use App\Http\Controllers\Admin\Files\PersonalFilesController;
 
 
 Route::get('/', [FilesController::class, 'index'])->name('dashboard');
+Route::get('/received', [FilesController::class, 'index'])->name('received');
+Route::get('/sent', [FilesController::class, 'index'])->name('sent');
+
 Route::get('/show/{file}', [FilesController::class, 'show'])->name('show');
+Route::get('/show/{filePubId}/public', [FilesController::class, 'show'])->name('pubid.show.public');
+Route::get('/show/{filePubId}/protected', [FilesController::class, 'show'])->name('pubid.show.protected');
+
 Route::get('/create/{user}', [FilesController::class, 'create'])->name('create');
 Route::post('/send/{user}', [FilesController::class, 'store'])->name('store');
 Route::delete('/delete/{id}', [FilesController::class, 'destroy'])->name('delete');
@@ -22,4 +28,4 @@ Route::delete('/multiple/delete', [MultipleFilesController::class, 'destroy'])->
 
 Route::get('/personal/create', [PersonalFilesController::class, 'create'])->name('personal.create');
 Route::post('/personal/store', [PersonalFilesController::class, 'store'])->name('personal.store');
-Route::get('/personal', [PersonalFilesController::class, 'index'])->name('personal.index');
+Route::get('/personal', [PersonalFilesController::class, 'index'])->name('personal.dashboard');

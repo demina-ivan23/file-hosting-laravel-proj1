@@ -24,35 +24,30 @@ class File extends Model
 
     public function scopeFilter($query)
     {
-    
-    $authUser = User::find(auth()->user()->id);
-      
 
-    if(request('filter_sent_files')){
-      
-    if (request('filter_sent_files') !== 'all') {
-        $query->where('sender_id', $authUser->id)
-              ->where('receiver_id', request('filter_sent_files'));
-    }
-    else{
-        $query->where('sender_id', $authUser->id);
-    }
-        
-      }
+        $authUser = User::find(auth()->user()->id);
 
-      if(request('filter_received_files')){
-      
-        if (request('filter_received_files') !== 'all') {
-            $query->where('sender_id', request('filter_sent_files'))
-                  ->where('receiver_id', $authUser->id);
+
+        if (request('filter_sent_files')) {
+
+            if (request('filter_sent_files') !== 'all') {
+                $query->where('sender_id', $authUser->id)
+                    ->where('receiver_id', request('filter_sent_files'));
+                    // dd('hi');
+            } else {
+                $query->where('sender_id', $authUser->id);
+            }
         }
-        else{
-        $query->where('receiver_id', $authUser->id);
 
+        if (request('filter_received_files')) {
+
+            if (request('filter_received_files') !== 'all') {
+                $query->where('sender_id', request('filter_received_files'))
+                    ->where('receiver_id', $authUser->id);
+            } else {
+                $query->where('receiver_id', $authUser->id);
+            }
         }
-            
-          }
-
-      return $query;
+        return $query;
     }
 }

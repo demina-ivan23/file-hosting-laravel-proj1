@@ -11,23 +11,23 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('user_blacklist', function (Blueprint $table) {
+        Schema::create('global_file_owner', function (Blueprint $table) {
             $table->id();
 
-            $table->unsignedBigInteger('blocker_id');
-            $table->index('blocker_id');
-            $table->foreign('blocker_id')
+            $table->unsignedBigInteger('owner_id');
+            $table->index('owner_id');
+            $table->foreign('owner_id')
             ->references('id')
             ->on('users')
             ->onDelete('CASCADE');
 
-            $table->unsignedBigInteger('blocked_user_id');
-            $table->index('blocked_user_id');
-            $table->foreign('blocked_user_id')
+            $table->unsignedBigInteger('global_file');
+            $table->index('global_file');
+            $table->foreign('global_file')
             ->references('id')
-            ->on('users')
+            ->on('global_files')
             ->onDelete('CASCADE');
-            
+
             $table->timestamps();
         });
     }
@@ -37,6 +37,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('user_blacklist');
+        Schema::dropIfExists('global_file_owner');
     }
 };

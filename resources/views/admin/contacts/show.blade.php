@@ -6,6 +6,11 @@
         {{ session('success') }}
       </div>
   @endif
+  @if (session('error'))
+  <div class="alert alert-danger">
+    {{ session('error') }}
+  </div>
+@endif
   <a href="{{route('admin.contacts.dashboard')}}" class="btn btn-light">Go Back To Contacts</a>
     <div class="card mt-4">
         <div class="card-body">
@@ -32,12 +37,8 @@
                   Filter
                 </button>
                 <ul class="dropdown-menu">
-                  <form action="#" method="GET">
-                    <li><button class="dropdown-item" name="filter_sent_files" id="filter_sent_files" type="submit" value="{{$contact->id}}">Show Sent Files</button></li>
-                  </form>
-                  <form action="#" method="GET">
-                    <li><button class="dropdown-item" name="filter_received_files" id="filter_received_files" type="submit" value="{{$contact->id}}">Show Received Files</button></li>
-                  </form>
+                    <li><a class="dropdown-item" href="{{route('admin.contacts.show.sent', ['user' => $contact]) }}">Show Sent Files</a></li>
+                    <li><a class="dropdown-item" href="{{ route('admin.contacts.show.received', ['user' => $contact])}}">Show Received Files</a></li>
                   <form action="#" method="GET">
                     <li><a class="dropdown-item" href="{{route('admin.contacts.show', ['user' => $contact->id])}}">Show All Files</a></li>
                   </form>
@@ -53,9 +54,13 @@
           @foreach ($files as $file)
                   @include('admin.files.components.file-card', ['file' => $file])     
           @endforeach
+          
+                <div class="mt-5">
+                
+                  {{$files->links()}}
+                </div>
           @endif 
           
-    
 </div>
 
 @endsection

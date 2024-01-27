@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration
 {
@@ -11,26 +11,28 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('files', function (Blueprint $table) {
+        Schema::create('global_files', function (Blueprint $table) {
             $table->id();
+            $table->string('publicId');
+
             $table->string('path');
             $table->string('title')->nullable();  
             $table->string('description')->nullable();  
             $table->string('category')->nullable();
+            $table->unsignedBigInteger('views')->default(0);
+            $table->unsignedBigInteger('downloads')->default(0);
+            $table->boolean('isPublic');
             $table->string('state');
-
-            $table->unsignedBigInteger('sender_id');
-            $table->index('sender_id');
-            $table->foreign('sender_id')
+            
+            
+            $table->unsignedBigInteger('owner_id');
+            $table->index('owner_id');
+            $table->foreign('owner_id')
             ->references('id')
             ->on('users')
             ->onDelete('CASCADE');
-            $table->unsignedBigInteger('receiver_id');
-            $table->index('receiver_id');
-            $table->foreign('receiver_id')
-            ->references('id')
-            ->on('users')
-            ->onDelete('CASCADE');
+            
+            $table->date('expireDate');
             $table->timestamps();
         });
     }
@@ -40,6 +42,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('files');
+        Schema::dropIfExists('global_files');
     }
 };

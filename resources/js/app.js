@@ -13,7 +13,7 @@ import { createApp } from 'vue';
  * to use in your application's views. An example is included for you.
  */
 
- const app = createApp({
+const app = createApp({
     data() {
         return {
             showFileFormatDropdown: false,
@@ -27,26 +27,46 @@ import { createApp } from 'vue';
             event.preventDefault();
 
             const form = document.getElementById('file-sending-form');
-
             if (form !== undefined && form !== null) {
-                const filesInput = document.querySelector('#files');
-const contact_user_id = document.getElementById('contact_user_id').value; 
-                if (filesInput.files.length == 1) {
-                    form.action = "http://localhost:8000/files/send/" + contact_user_id;
-                    form.submit();
-                } else if (filesInput.files.length > 1) {
-                    const fileCompressionFormat = document.getElementById('fileCompressionFormat').value;
-
-                    if (fileCompressionFormat === "none") {
-                        const confirmed = confirm("You chose no compression format, so your files won't be sent as an archive but separately. Still proceed?");
-                        if (confirmed) {
-                            // Continue with form submission
+                const formerAction = form.action;
+                const contactUserIdElement = document.getElementById('contact_user_id');
+        const contact_user_id = contactUserIdElement ? contactUserIdElement.value : null;
+                if(formerAction.includes("http://localhost:8000/files/send/"))
+                {
+                    const filesInput = document.querySelector('#files');
+                    
+                    if (filesInput.files.length == 1) {
+                        form.action = "http://localhost:8000/files/send/" + contact_user_id;
+                        form.submit();
+                        
+                    } else if (filesInput.files.length > 1) {
+                        const fileCompressionFormat = document.getElementById('fileCompressionFormat').value;
+                        
+                        if (fileCompressionFormat === "none") {
+                            const confirmed = confirm("You chose no compression format, so your files won't be sent as an archive but separately. Still proceed?");
+                            if (confirmed) {
+                                // Continue with form submission
+                                form.action = "http://localhost:8000/files/multiple/send/" + contact_user_id;
+                                form.submit();
+                            }
+                        } else {
                             form.action = "http://localhost:8000/files/multiple/send/" + contact_user_id;
+                            
                             form.submit();
                         }
-                    } else  {
-                        form.action = "http://localhost:8000/files/multiple/send/" + contact_user_id;
-
+                    }
+                }
+                else if(formerAction == "http://localhost:8000/files/personal/store" || formerAction == "http://localhost:8000/global-files/store")
+                {
+                    // console.log(fileAccessibility.value);
+                    const fileAccessibility = document.querySelector('#fileAccessibility').value;
+                    if(fileAccessibility === "private"){
+                        form.action = "http://localhost:8000/files/personal/store";
+                        form.submit();
+                    }
+                    else if(fileAccessibility === "protected" || fileAccessibility === "public")
+                    {
+                        form.action = "http://localhost:8000/global-files/store";
                         form.submit();
                     }
                 }

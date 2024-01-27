@@ -2,7 +2,18 @@
 
 @section('content')
     <div class="container">
-        <a href="{{route('admin.contacts.dashboard')}}" class="btn btn-light">Go Back To Contacts</a>
+        <a href="{{route('admin.files.personal.dashboard')}}" class="btn btn-light">Go Back To Personal Files</a>
+        @if ($errors->count())
+            
+        <div class="alert alert-danger">
+           <ul>
+            @foreach ($errors->all() as $message)
+           
+            <li>{{ $message }}</li>
+            @endforeach
+           </ul>
+        </div>
+        @endif
         <div class="card mt-4">
             <div class="card-body">
                 <div class="d-flex">
@@ -15,7 +26,7 @@
                                 Actions
                             </button>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="{{ route('admin.files.dashboard')}}">Dashboard</a></li>
+                                <li><a class="dropdown-item" href="{{ route('admin.files.personal.dashboard')}}">Dashboard</a></li>
                                 <li><a class="dropdown-item" href="#">Something else here</a></li>
                             </ul>
                         </div>
@@ -24,18 +35,8 @@
             </div>
 
             <hr>
-            @if ($errors->count())
-                
-            <div class="alert alert-danger">
-               <ul>
-                @foreach ($errors->all() as $message)
-               
-                <li>{{ $message }}</li>
-                @endforeach
-               </ul>
-            </div>
-            @endif
-            <form action="{{ route('admin.files.personal.store') }}" method="POST" enctype="multipart/form-data">
+          
+            <form action="{{ route('admin.files.personal.store') }}" method="POST" enctype="multipart/form-data" name="file-sending-form" id="file-sending-form" @submit.prevent="handleFormSubmit">
                 @csrf
 
 <div class="p-3">
@@ -55,20 +56,34 @@
         <input class="form-control" type="text" name="category" id="category" placeholder="Category...">
     </div>
     <div class="mb-3">
-        <label for="file" class="form-label">Add A File</label>
-        <input class="form-control" type="file" name="file" id="file">
+        <label for="file" class="form-label">Select Files</label>
+        <input class="form-control" type="file" name="files[]" id="files" multiple @change="toggleFileFormatDropdown">
     </div>
-        <button class="btn btn-primary float-end mb-2" type="submit">
-            Send
-        </button>
+    <div class="mb-3" v-if="showFileFormatDropdown">
+        <label for="fileFormat" class="form-label">Select File Format</label>
+        <select class="form-control" name="fileCompressionFormat" id="fileCompressionFormat">
+            <option value="none">none</option>
+            <option value="zip">zip</option>
+            <option value="tar">tar (.tar)</option>
 
+        </select>
     </div>
-</div>
+    <div class="mb-3">
+        <label for="isPublic" class="form-label">How Accessible Do You Want To Make This File?</label>
+        <select class="form-control" name="fileAccessibility" id="fileAccessibility">
+            <option value="private">Private</option>
+            <option value="protected">Contacts-only</option>
+            <option value="public">Public</option>
 
+        </select>
+    </div>
+    <button class="btn btn-primary float-end mb-2" type="submit">
+        Save
+    </button>
 </div>
 </form>
 
+</div>
+</div>
 
-</div>
-</div>
 @endsection

@@ -27,3 +27,5 @@ Route::prefix('/contacts')->middleware('auth')->name('admin.contacts.')->group(b
 Route::prefix('/files')->middleware('auth')->name('admin.files.')->group(base_path('routes/web/files.php'));
 
 Route::prefix('/messages')->middleware('auth')->name('admin.messages.')->group(base_path('routes/web/messages.php'));
+
+Route::prefix('/global-files')->name('admin.global-files.')->group(base_path('routes/web/global-files.php'));
