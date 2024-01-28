@@ -116,12 +116,12 @@ class FileService{
 
             $file = GlobalFile::where('publicId', $publicId)->first();
             $authUser = static::findUser(auth()->id());
-            if($authUser->sentFiles->contains($file->id) || $authUser->receivedFiles->contains($file->id))
-            {
+            dd($file, $authUser);
+            
                 $file_path = public_path('storage\\' . $file->path);
                 $file_path = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $file_path); 
                 return $file_path;
-            }
+            
 
         } catch (Exception $e) {
             return $e->getMessage();

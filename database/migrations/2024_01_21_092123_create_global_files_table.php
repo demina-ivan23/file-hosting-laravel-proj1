@@ -23,7 +23,7 @@ return new class extends Migration
             $table->unsignedBigInteger('downloads')->default(0);
             $table->boolean('isPublic');
             $table->string('state');
-            
+            $table->string('mimeType');
             
             $table->unsignedBigInteger('owner_id');
             $table->index('owner_id');

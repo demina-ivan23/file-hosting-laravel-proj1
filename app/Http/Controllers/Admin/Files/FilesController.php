@@ -88,6 +88,7 @@ class FilesController extends Controller
             $fileExists = file_exists($pathOrMessage);
             if ($fileExists) {
                 $path = $pathOrMessage;
+                $file = File::where('path')
                 return response()->download($path);
             } else {
                 $message = $pathOrMessage;

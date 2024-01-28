@@ -31,76 +31,57 @@ class GlobalFileService
     static function storeProtectedFile($request)
     {
         if($request->hasFile('files')){
+            $path = ' ';
             $authUser = static::findUser(auth()->id());
-            $data= $request->all();
+            $data = $request->all();
             if(count($data['files']) > 1)
             {
                 if($data['fileCompressionFormat'] === 'none'){
                     return 'You Cannot Post Multiple Global Files Without Any Compression Format Selected';
                 }
                 else if($data['fileCompressionFormat'] === 'tar'){
-                    $data = $request->all();
                     $archivemaker = new TarArchiveMaker(new FileUploadService());
                     $archive_name = Str::random(20) . '.tar';
                     $archive = $archivemaker->makeArchive($data['files'], $archive_name);
-                    $file = GlobalFile::create([
-                        'path' => str_replace(['/', '\\'], DIRECTORY_SEPARATOR,  'files/archives/' . $archive_name),
-                        'title' => $data['title'],
-                        'description' => $data['description'],
-                        'category' => $data['category'],
-                        'isPublic' => false,
-                        'state' => 'active',
-                        'publicId' => Str::random(30),
-                        'owner_id' => $authUser->id,
-                        'expireDate' => Carbon::now()->addDays(30)
-                    ]);
-                    $authUser->ownedGlobalFiles()->attach($file);
+                    $path = str_replace(['/', '\\'], DIRECTORY_SEPARATOR,  'files/archives/' . $archive_name);
+                    
                 }
                 else if($data['fileCompressionFormat'] === 'zip'){
-                    $data = $request->all();
                     $archivemaker = new ZipArchiveMaker(new FileUploadService());
                     $archive_name = Str::random(20) . '.zip';
                     $archive = $archivemaker->makeArchive($data['files'], $archive_name);
-                    $file = GlobalFile::create([
-                        'path' => str_replace(['/', '\\'], DIRECTORY_SEPARATOR,  'files/archives/' . $archive_name),
-                        'title' => $data['title'],
-                        'description' => $data['description'],
-                        'category' => $data['category'],
-                        'isPublic' => false,
-                        'state' => 'active',
-                        'publicId' => Str::random(30),
-                        'owner_id' => $authUser->id,
-                        'expireDate' => Carbon::now()->addDays(30)
-                    ]);
-                    $authUser->ownedGlobalFiles()->attach($file);
+                    $path = str_replace(['/', '\\'], DIRECTORY_SEPARATOR,  'files/archives/' . $archive_name);
                 }
                 else{
                     return 'Unknown File Compression Format';
                 }
+                   
             }   
             else{
-                $data = $request->all();
                 $fileloader = new FileUploadService();
                 $path = $fileloader->UploadFile($data['files'][0]);
-                $file = GlobalFile::create([
-                    'path' => $path,
-                    'title' => $data['title'],
-                    'description' => $data['description'],
-                    'category' => $data['category'],
-                    'isPublic' => false,
-                    'state' => 'active',
-                    'publicId' => Str::random(30),
-                    'owner_id' => $authUser->id,
-                    'expireDate' => Carbon::now()->addDays(30)
-                ]);
-                $authUser->ownedGlobalFiles()->attach($file);
-                
             } 
-            return 'Contacts-only File Uploaded Successfully';
+            
         }
         else{
             return 'No Files Selected';
         }
+        $file_path = public_path('storage\\' . $path);
+        $file_path = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $file_path);  
+        $file = GlobalFile::create([
+            'path' => $path,
+            'title' => $data['title'],
+            'description' => $data['description'],
+            'category' => $data['category'],
+            'isPublic' => false,
+            'state' => 'active',
+            'publicId' => Str::random(30),
+            'owner_id' => $authUser->id,
+            'expireDate' => Carbon::now()->addDays(30),
+            'mimeType' => mime_content_type($file_path)
+        ]);
+        $authUser->ownedGlobalFiles()->attach($file);
+        return 'Contacts-only File Uploaded Successfully';
     }
     static function getFileByPubId($publicId){
         
