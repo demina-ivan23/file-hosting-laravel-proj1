@@ -5,7 +5,7 @@ use App\Http\Controllers\Admin\Files\FilesController;
 use App\Http\Controllers\Admin\GlobalFiles\GlobalFileController;
 
 Route::get('/public', [GlobalFileController::class, 'index'])->name('public');
-Route::get('/protected', [GlobalFileController::class, 'index'])->name('protected');
+Route::get('/protected', [GlobalFileController::class, 'index'])->middleware('auth')->name('protected');
 Route::get('/show/{file}', [GlobalFileController::class, 'show'])->name('show');
 
 Route::get('/download/{filePubId}/public', [FilesController::class, 'show'])->name('pubid.show.public');
