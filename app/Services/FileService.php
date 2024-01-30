@@ -10,19 +10,20 @@ use App\Models\GlobalFile;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 
-class FileService{
+class FileService
+{
 
     static function getAllFiles()
     {
         $files = File::where(function ($query) {
             $query->where('sender_id', auth()->id());
         })
-        ->orWhere(function ($query) {
-            $query->where('receiver_id', auth()->id());
-        })
-        ->filter()
-        ->latest()
-        ->paginate(10);
+            ->orWhere(function ($query) {
+                $query->where('receiver_id', auth()->id());
+            })
+            ->filter()
+            ->latest()
+            ->paginate(10);
         return $files;
     }
     static function getSentFiles()
@@ -30,130 +31,113 @@ class FileService{
         $files = File::where(function ($query) {
             $query->where('sender_id', auth()->id());
         })
-        ->filter()
-        ->latest()
-        ->paginate(10);
+            ->filter()
+            ->latest()
+            ->paginate(10);
         return $files;
     }
     static function getReceivedFiles()
     {
         $files = File::where(function ($query) {
-        $query->where('receiver_id', auth()->id());
+            $query->where('receiver_id', auth()->id());
         })
-        ->filter()
-        ->latest()
-        ->paginate(10);
+            ->filter()
+            ->latest()
+            ->paginate(10);
         return $files;
     }
 
-    static function createFiles($id){
+    static function createFiles($id)
+    {
         $userToSendTo = static::findUser($id);
         $userSending = static::findUser(auth()->id());
-        if(Gate::allows('start-chat', [$userToSendTo, $userSending])){
-           return $userToSendTo;
-        }
-        else{
-           abort(403, "You Are Not Allowed To Send Anything To This User. This May Be Due To Several Reasons. 1 - You May Be Blocked By This User. 2 - This User May Not Have You As A Contact. 3 - You May Have Blocked This User As Well.");
+        if (Gate::allows('start-chat', [$userToSendTo, $userSending])) {
+            return $userToSendTo;
+        } else {
+            abort(403, "You Are Not Allowed To Send Anything To This User. This May Be Due To Several Reasons. 1 - You May Be Blocked By This User. 2 - This User May Not Have You As A Contact. 3 - You May Have Blocked This User As Well.");
         }
     }
 
-    static function sendFile($request, $id){
-        try{
+    static function sendFile($request, $id)
+    {
+        try {
 
             $authUser = static::findUser(auth()->id());
             $data = $request->all();
             $userReciever = static::findUser($id);
-        if($request->hasFile('files'))
-        {
-            $fileloader = new FileUploadService();
-            $path = $fileloader->UploadFile($data['files'][0]);
-            $file = File::create([
-                'path' => $path,
-                'title' => $data['title'],
-                'description' => $data['description'],
-                'category' => $data['category'],
-                'state' => 'active',
-                'sender_id' => $authUser->id,
-                'receiver_id' => $userReciever->id
-            ]);
-            $authUser->sentFiles()->attach($file, ['userReceiver' => $userReciever->id]);
-            //Notice: make messages for each sent/received file here
-            return 'File Uploaded Successfully';
+            if ($request->hasFile('files')) {
+                $fileloader = new FileUploadService();
+                $path = $fileloader->UploadFile($data['files'][0]);
+                $file = File::create([
+                    'path' => $path,
+                    'title' => $data['title'],
+                    'description' => $data['description'],
+                    'category' => $data['category'],
+                    'state' => 'active',
+                    'sender_id' => $authUser->id,
+                    'receiver_id' => $userReciever->id
+                ]);
+                $authUser->sentFiles()->attach($file, ['userReceiver' => $userReciever->id]);
+                //Notice: make messages for each sent/received file here
+                return 'File Uploaded Successfully';
+            }
+        } catch (Exception $e) {
+            return $e->getMessage();
         }
-    } catch(Exception $e){
-        return $e->getMessage();
-    }
     }
     static function findUser($id)
     {
         $user = User::find($id);
-        if(!$user){
+        if (!$user) {
             throw new Exception("User Not Found, Id: {$id}");
         }
         return $user;
     }
     static function getPath($id)
     {
-        try{
-
-            $authUser = static::findUser(auth()->id());
-            if($authUser->sentFiles->contains($id) || $authUser->receivedFiles->contains($id))
-            {
-                $file = File::find($id);
-                $file_path = public_path('storage\\' . $file->path);
-                $file_path = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $file_path); 
-                return $file_path;
-            }
-
-        } catch (Exception $e) {
-            return $e->getMessage();
+        $authUser = static::findUser(auth()->id());
+        if ($authUser->sentFiles->contains($id) || $authUser->receivedFiles->contains($id)) {
+            $file = File::find($id);
+            $file_path = public_path('storage\\' . $file->path);
+            $file_path = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $file_path);
+            return $file_path;
         }
-        
     }
     static function getPathByPubId($publicId)
     {
-        try{
+        try {
 
             $file = GlobalFile::where('publicId', $publicId)->first();
-            $authUser = static::findUser(auth()->id());
-            
-                $file_path = public_path('storage\\' . $file->path);
-                $file_path = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $file_path); 
-                return $file_path;
-            
-
+            $file_path = public_path('storage\\' . $file->path);
+            $file_path = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $file_path);
+            return $file_path;
         } catch (Exception $e) {
             return $e->getMessage();
         }
-        
     }
-     static function fileExists($path){
-        if(Storage::exists($path))
-        {
+    static function fileExists($path)
+    {
+        if (Storage::exists($path)) {
             return true;
-        }
-        else{
+        } else {
             return false;
         }
-
-     }
+    }
     static function deleteFile($id)
     {
         $file = File::find($id);
-        if(!$file){
+        if (!$file) {
             abort(404);
         }
         $receiver = $file->receiver;
         $sender = $file->sender;
-        if($file->sender->id === auth()->id() xor $file->receiver->id === auth()->id())
-        {
+        if ($file->sender->id === auth()->id() xor $file->receiver->id === auth()->id()) {
             $fileloader = new FileUploadService();
-            $fileloader->deleteFile(str_replace( ['/', '\\'] ,DIRECTORY_SEPARATOR , $file->path));
+            $fileloader->deleteFile(str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $file->path));
             $file->delete();
-            
-           
-            if($file->sender->id === auth()->id() && $file->receiver->id !== auth()->id())
-            {
+
+
+            if ($file->sender->id === auth()->id() && $file->receiver->id !== auth()->id()) {
 
                 $message_to_sender = Message::create([
                     'text' => "You Deleted A File That Was Sent To $receiver->email By You",
@@ -167,8 +151,7 @@ class FileService{
                 ]);
             }
 
-            if($file->receiver->id === auth()->id() && $file->sender->id !== auth()->id())
-            {
+            if ($file->receiver->id === auth()->id() && $file->sender->id !== auth()->id()) {
 
                 $message_to_sender = Message::create([
                     'text' => "User $receiver->email Have Deleted A File That Was Sent To Them By You",
@@ -189,7 +172,7 @@ class FileService{
         //PersonalFilesController take care of this part
         // else if($file->receiver->id === auth()->id() && $file->sender->id === auth()->id())
         // {
-             
+
         //     $fileloader = new FileUploadService();
         //     $fileloader->deleteFile(str_replace( ['/', '\\'] ,DIRECTORY_SEPARATOR , $file->path));
         //     $file->delete();
@@ -202,10 +185,9 @@ class FileService{
         // return redirect(route('admin.files.personal.index'))->with('success', 'File Deleted Successfully');
 
         // }
-        
-        else{
+
+        else {
             return 'You Are Neither File\'s Sender Nor It\'s Receiver. But You Tried :)';
         }
     }
-
 }

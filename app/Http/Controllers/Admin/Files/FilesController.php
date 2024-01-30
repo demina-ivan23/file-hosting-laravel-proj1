@@ -61,38 +61,29 @@ class FilesController extends Controller
         $currentRoute = request()->route()->getName();
         if($currentRoute === 'admin.files.show')
         {
-
-            $pathOrMessage = FileService::getPath($id);
-            $fileExists = file_exists($pathOrMessage);
-            if ($fileExists) {
-                $path = $pathOrMessage;
-                return response()->download($path);
-            } else {
-                $message = $pathOrMessage;
-                return redirect()->route('admin.files.dashboard')->with('error', $message);
-            }
+            $path = FileService::getPath($id);
+        if(!$path){
+            $message = 'File Not Found';
+            return redirect()->route('admin.files.dashboard')->with('error', $message);   
+        }
+            return response()->download($path);
         }
         else if($currentRoute === 'admin.files.pubid.show.public'){
-            $pathOrMessage = FileService::getPathByPubId($id);
-            $fileExists = file_exists($pathOrMessage);
-            if ($fileExists) {
-                $path = $pathOrMessage;
-                return response()->download($path);
-            } else {
-                $message = $pathOrMessage;
+            $path = FileService::getPathByPubId($id);            
+            if (!$path) {
+                $message = 'File Not Found';
                 return redirect()->route('admin.global-files.public')->with('error', $message);
-            }
+            } 
+            return response()->download($path);
+            
         }
         else if($currentRoute === 'admin.files.pubid.show.protected'){
-            $pathOrMessage = FileService::getPathByPubId($id);
-            $fileExists = file_exists($pathOrMessage);
-            if ($fileExists) {
-                $path = $pathOrMessage;
-                return response()->download($path);
-            } else {
-                $message = $pathOrMessage;
+            $path = FileService::getPathByPubId($id);            
+            if (!$path) {
+                $message = 'File Not Found';
                 return redirect()->route('admin.global-files.protected')->with('error', $message);
-            }
+            } 
+            return response()->download($path);
         }
     }
 
