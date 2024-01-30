@@ -57,6 +57,7 @@
                 </ul>
                 
             </div>
+            @auth
             @if(auth()->id() !== $file->owner->id)
             <div class="col-sm-2 d-flex justify-content-center align-items-center">
                 <form action="{{ route('admin.files.personal.store') }}" method="POST">
@@ -72,6 +73,7 @@
                 </form>
             </div>
             @endif
+            @endauth
             @if ($file->owner->id === auth()->id())
                 <div  class="col-sm-1 d-flex justify-content-center align-items-center">
                     <form action="{{route('admin.global-files.delete', ['id' => $file->id])}}" method="POST">
