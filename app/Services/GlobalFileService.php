@@ -172,6 +172,20 @@ class GlobalFileService
             }
         }
     }
+    static function incrementDownloads($file)
+    {
+        if(auth()->id())
+        {
+            $authUser = static::findUser(auth()->id());
+            if (!$authUser->downloadedGlobalFiles->contains($file->id)) {
+                $downloads = $file->downloads + 1;
+                $file->update(['downloads' => $downloads]);
+                $authUser->downloadedGlobalFiles()->attach($file->id);
+            } else {
+                //   
+            }
+        }
+    }
     static function incrementLikes($file)
     {
         if(auth()->id())

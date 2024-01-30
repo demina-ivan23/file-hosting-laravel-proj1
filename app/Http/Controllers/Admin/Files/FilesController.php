@@ -8,8 +8,7 @@ use App\Models\Message;
 use Illuminate\Http\Request;
 use App\Services\FileUploadService;
 use App\Http\Controllers\Controller;
-
-
+use App\Services\GlobalFileService;
 
 class FilesController extends Controller
 {
@@ -73,7 +72,9 @@ class FilesController extends Controller
             if (!$path) {
                 $message = 'File Not Found';
                 return redirect()->route('admin.global-files.public')->with('error', $message);
-            } 
+            }
+            $file = GlobalFileService::getFileByPubId($id);
+            GlobalFileService::incrementDownloads($file);
             return response()->download($path);
             
         }
@@ -83,6 +84,8 @@ class FilesController extends Controller
                 $message = 'File Not Found';
                 return redirect()->route('admin.global-files.protected')->with('error', $message);
             } 
+            $file = GlobalFileService::getFileByPubId($id);
+            GlobalFileService::incrementDownloads($file);
             return response()->download($path);
         }
     }

@@ -102,6 +102,9 @@
 <div>
     Likes: {{$file->likes}}
 </div>
+<div>
+    Downloads: {{$file->downloads}}
+</div>
         </div>
     </div>
 </div>
