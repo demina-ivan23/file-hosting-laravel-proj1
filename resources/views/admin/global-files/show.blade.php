@@ -31,7 +31,23 @@
         @else
         <div class="mt-2">No description</div> 
         @endif
-        <div class="mt-2">Views: {{$file->views}}</div>
+        @if ($file->mimeType === 'video/mp4')
+        <div class="d-flex justify-content-center align-items-center mt-3 ">
+          <video width="750" height="450" controls autoplay muted>
+            <source src="{{ asset('storage/' . $file->path) }}" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        </div>
+        @endif
+        @if (str_contains($file->mimeType, 'image'))
+        <div class="d-flex justify-content-center align-items-center mt-3">
+          <img src="{{ asset('storage/' . $file->path)}}" alt="" style="max-width: 90%; height: auto;">
+        </div>
+        @endif
+   
+        <div class="d-flex justify-content-end align-items-center">
+          <div class="mt-3">Views: {{$file->views}}</div>
+        </div>
     </div>
 
    </div>

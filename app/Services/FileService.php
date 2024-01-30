@@ -116,7 +116,6 @@ class FileService{
 
             $file = GlobalFile::where('publicId', $publicId)->first();
             $authUser = static::findUser(auth()->id());
-            dd($file, $authUser);
             
                 $file_path = public_path('storage\\' . $file->path);
                 $file_path = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $file_path); 
