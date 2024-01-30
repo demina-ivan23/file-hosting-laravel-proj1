@@ -100,6 +100,11 @@ class GlobalFileController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $result = GlobalFileService::deleteFile($id);
+        if(str_contains($result, 'Successfully')){
+            return redirect()->back()->with('success', $result);
+        } else {
+            return redirect()->back()->with('error', $result);
+        }
     }
 }

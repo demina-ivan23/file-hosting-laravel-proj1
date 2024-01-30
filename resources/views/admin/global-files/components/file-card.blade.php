@@ -76,7 +76,7 @@
             @endauth
             @if ($file->owner->id === auth()->id())
                 <div  class="col-sm-1 d-flex justify-content-center align-items-center">
-                    <form action="{{route('admin.global-files.delete', ['id' => $file->id])}}" method="POST">
+                    <form action="{{route('admin.global-files.delete', ['id' => $file->publicId])}}" method="POST">
                         @csrf
                         @method('DELETE')
                         <button class="btn btn-outline-danger" type="submit" onclick="return confirm('Do You Want To Delete This File? It Will Be Deleted For Everyone')">Delete</button>

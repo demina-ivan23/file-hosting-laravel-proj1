@@ -5,6 +5,7 @@ namespace App\Services;
 use Exception;
 use Carbon\Carbon;
 use App\Models\User;
+use App\Models\Message;
 use App\Models\GlobalFile;
 use Illuminate\Support\Str;
 use App\Services\ArchiveMakers\TarArchiveMaker;
@@ -131,6 +132,30 @@ class GlobalFileService
         ]);
         $authUser->ownedGlobalFiles()->attach($file);
         return 'Public File Uploaded Successfully';
+    }
+    static function deleteFile($id){
+        $file = GlobalFile::where('publicId', $id)->first();
+        $authUser = static::findUser(auth()->id());
+        if(!$file)
+        {
+            abort(404);
+        }
+
+        if($file->owner->id === $authUser->id){
+            $fileloader = new FileUploadService();
+            $fileloader->deleteFile(str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $file->path));
+            $file->delete();
+            $message_to_owner = Message::create([
+                'text' => 'You Have Deleted A Global File',
+                'system' => true,
+                'userReceiver' => $authUser->id
+            ]);
+            $authUser->messages()->attach($message_to_owner);
+            return 'File Deleted Successfully';
+        }
+        else{
+            return 'You Are Not The Owner Of This File';
+        }
     }
     static function incrementViews($file)
     {
