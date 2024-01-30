@@ -134,13 +134,17 @@ class GlobalFileService
     }
     static function incrementViews($file)
     {
-        $authUser = static::findUser(auth()->id());
-        if (!$authUser->viewedGlobalFiles->contains($file->id)) {
-            $views = $file->views + 1;
-            $file->update(['views' => $views]);
-            $authUser->viewedGlobalFiles()->attach($file->id);
-        } else {
-            //   
+        if(auth()->id())
+        {
+
+            $authUser = static::findUser(auth()->id());
+            if (!$authUser->viewedGlobalFiles->contains($file->id)) {
+                $views = $file->views + 1;
+                $file->update(['views' => $views]);
+                $authUser->viewedGlobalFiles()->attach($file->id);
+            } else {
+                //   
+            }
         }
     }
     static function findUser($id)

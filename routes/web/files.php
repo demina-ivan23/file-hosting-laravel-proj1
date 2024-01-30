@@ -12,9 +12,8 @@ Route::get('/', [FilesController::class, 'index'])->name('dashboard');
 Route::get('/received', [FilesController::class, 'index'])->name('received');
 Route::get('/sent', [FilesController::class, 'index'])->name('sent');
 
-Route::get('/show/{file}', [FilesController::class, 'show'])->name('show');
-Route::get('/show/{filePubId}/public', [FilesController::class, 'show'])->name('pubid.show.public');
-Route::get('/show/{filePubId}/protected', [FilesController::class, 'show'])->name('pubid.show.protected');
+Route::get('/download/{file}', [FilesController::class, 'show'])->name('show');
+Route::get('/download/{filePubId}/protected', [FilesController::class, 'show'])->name('pubid.show.protected');
 
 Route::get('/create/{user}', [FilesController::class, 'create'])->name('create');
 Route::post('/send/{user}', [FilesController::class, 'store'])->name('store');

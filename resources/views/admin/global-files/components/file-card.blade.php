@@ -11,7 +11,7 @@
                         <div>
 
                             @if ($file->isPublic == true)
-                            <a class="btn btn-outline-primary" href="{{route('admin.files.pubid.show.public', ['filePubId' => $file->publicId])}}">Download</a>
+                            <a class="btn btn-outline-primary" href="{{route('admin.global-files.pubid.show.public', ['filePubId' => $file->publicId])}}">Download</a>
                             @endif
                             @if ($file->isPublic == false)
                             <a class="btn btn-outline-primary" href="{{route('admin.files.pubid.show.protected', ['filePubId' => $file->publicId])}}">Download</a>

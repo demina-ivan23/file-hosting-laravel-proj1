@@ -68,7 +68,7 @@ class FilesController extends Controller
         }
             return response()->download($path);
         }
-        else if($currentRoute === 'admin.files.pubid.show.public'){
+        else if($currentRoute === 'admin.global-files.pubid.show.public'){
             $path = FileService::getPathByPubId($id);            
             if (!$path) {
                 $message = 'File Not Found';
