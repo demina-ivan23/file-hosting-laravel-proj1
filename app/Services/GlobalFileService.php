@@ -147,11 +147,26 @@ class GlobalFileService
             }
         }
     }
+    static function incrementLikes($file)
+    {
+        if(auth()->id())
+        {
+            $authUser = static::findUser(auth()->id());
+            if (!$authUser->likedGlobalFiles->contains($file->id)) {
+                $likes = $file->likes + 1;
+                $file->update(['likes' => $likes]);
+                $authUser->likedGlobalFiles()->attach($file->id);
+                return 'You Have Successfully Liked A Global File';
+            } else {
+                return 'You Have Already Liked The File';  
+            }
+        }
+    }
     static function findUser($id)
     {
         $user = User::find($id);
         if (!$user) {
-            throw new Exception('User Not Found');
+            abort(404);
         }
         return $user;
     }

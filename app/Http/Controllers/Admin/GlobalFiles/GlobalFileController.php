@@ -62,11 +62,21 @@ class GlobalFileController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(string $id, Request $request)
     {
-        $file = GlobalFileService::getFileByPubId($id);
-        GlobalFileService::incrementViews($file);
-        return view('admin.global-files.show', ['file' => $file]);
+        $currentRoute = $request->route()->getName();
+        if($currentRoute === 'admin.global-files.show')
+        {
+            $file = GlobalFileService::getFileByPubId($id);
+            GlobalFileService::incrementViews($file);
+            return view('admin.global-files.show', ['file' => $file]);
+        }
+        if($currentRoute === 'admin.global-files.show.like')
+        {
+            $file = GlobalFileService::getFileByPubId($id);
+            $message = GlobalFileService::incrementLikes($file);
+            return redirect()->back()->with('success', $message);
+        }
     }
 
     /**

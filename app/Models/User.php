@@ -76,4 +76,8 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(GlobalFile::class, 'global_file_views', 'viewer_id', 'global_file');
     }
+    public function likedGlobalFiles()
+    {
+        return $this->belongsToMany(GlobalFile::class, 'global_file_likes', 'user_id', 'global_file');
+    }
 }

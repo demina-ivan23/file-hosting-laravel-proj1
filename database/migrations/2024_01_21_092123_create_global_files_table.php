@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('category')->nullable();
             $table->unsignedBigInteger('views')->default(0);
             $table->unsignedBigInteger('downloads')->default(0);
+            $table->unsignedBigInteger('likes')->default(0);
             $table->boolean('isPublic');
             $table->string('state');
             $table->string('mimeType');

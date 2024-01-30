@@ -59,7 +59,7 @@
             </div>
             @auth
             @if(auth()->id() !== $file->owner->id)
-            <div class="col-sm-2 d-flex justify-content-center align-items-center">
+            <div class="col-sm-1 d-flex justify-content-center align-items-center">
                 <form action="{{ route('admin.files.personal.store') }}" method="POST">
                     @csrf
                     
@@ -86,7 +86,22 @@
                 <div  class="col-sm-1 d-flex justify-content-center align-items-center">
                     <a class="btn btn-outline-secondary" href="{{ route('admin.global-files.show', ['file' => $file->publicId])}}">Preview</a>
                 </div>
-
+                @auth
+                @if (!auth()->user()->likedGlobalFiles->contains($file->id))
+                    
+                <div class="col-sm-1 d-flex justify-content-end align-items-center">
+                    <form action="{{ route('admin.global-files.show.like', ['file' => $file->publicId]) }}" method="POST">
+                        @csrf
+                        <button type="submit">
+                            <img src="{{asset('storage/icons/thumbs-up.png')}}" alt="" width="25">
+                        </button>
+                    </form>
+                </div>
+                @endif
+                @endauth
+<div>
+    Likes: {{$file->likes}}
+</div>
         </div>
     </div>
 </div>
