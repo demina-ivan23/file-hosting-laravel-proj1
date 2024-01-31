@@ -26,8 +26,17 @@ class CommentController extends Controller
             if(str_contains($result, 'Successfully')){
                 return redirect()->back()->with('success', $result);
             } else {
-                return redirect()->back()->with('success', $result);
+                return redirect()->back()->with('error', $result);
             }
+        }
+    }
+
+    public function destroy($id){
+        $result = CommentService::deleteComment($id);
+        if(str_contains($result, 'Successfully')){
+            return redirect()->back()->with('success', $result);
+        } else {
+            return redirect()->back()->with('error', $result);
         }
     }
 }

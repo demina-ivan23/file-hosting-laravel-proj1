@@ -25,6 +25,18 @@ class CommentService
             return $e->getMessage();
         }
     }
+    static function deleteComment($id)
+    {
+        $authUser = static::findUser(auth()->id());
+        $comment = static::findComment($id);
+        if($comment->author->id === $authUser->id)
+        {
+            $comment->delete();
+            return 'Comment Deleted Successfully';
+        } else {
+            return 'You Are Not The Comment\'s Owner';
+        }
+    }
     static function incrementLikes($id){
             $authUser = static::findUser(auth()->id());
             $comment = static::findComment($id);

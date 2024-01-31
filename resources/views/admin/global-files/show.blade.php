@@ -81,7 +81,11 @@
         <img src="/users/profiles/images/user.png" width="30" height="30"  alt="" class="mr-5">
         <div>
           <h5>
+            @if ($comment->author->id === auth()->id())
+            {{$comment->author->name}} (You)
+            @else
             {{$comment->author->name}}
+            @endif
           </h5>
         </div>
       </div>
@@ -92,6 +96,17 @@
       <div class="d-flex justify-content-start mt-4">
         Likes: {{ $comment->likes}}
       </div>
+      @if ($comment->author->id === auth()->id())
+      <div class="d-flex justify-content-end">
+        <form action="{{ route('admin.global-files.comments.delete', ['id' => $comment->id])}}" method="POST">
+         @csrf
+         @method('DELETE')
+          <button class="btn btn-outline-danger" type="submit" onclick="return confirm('Do You Really Want To Delete This Comment?')">
+            Delete
+          </button>
+        </form>
+      </div>
+      @else
       @if (!auth()->user()->likedComments->contains($comment->id))
       <div class="d-flex justify-content-end">
             
@@ -102,6 +117,7 @@
           </button>
         </form>
       </div>
+      @endif
       @endif
     </div>
     @endforeach
