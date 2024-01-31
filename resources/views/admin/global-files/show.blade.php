@@ -49,6 +49,42 @@
           <div class="mt-3">Views: {{$file->views}}</div>
         </div>
     </div>
+    <form method="POST" action="{{route('admin.global-files.comments.store', ['file' => $file->publicId])}}" class="border border-gray-300 bg-gray-100 p-6 rounded-xl">
+      @csrf
+   
+      <header class="flex items-center">
+        <img src="/users/profiles/images/user.png" width="105" height="105"  alt="">
+
+   
+        <h2 class="ml-3">
+        Leave Your comment about this post
+      </h2>
+      </header>
+   
+      <div class="mt-6">
+        <textarea
+        class="mt-4 rounded-xl border border-gray-200 bg-gray-50 w-full p-2 text-sm focus:outline-none focus:ring"
+        name="text"
+        rows="5"
+        placeholder="type here..."
+        required></textarea>
+          
+      </div>
+      <div class="flex justify-end pt-6">
+        <button class="btn btn-primary">Post</button>
+      </div>
+   
+    </form>
+    <div class="card-body">
+      @foreach ($file->comments as $comment)
+          <div class="d-flex">
+            {{$comment->text}}
+          </div>
+          <div class="d-flex">
+            {{$comment->author->name}}
+          </div>
+      @endforeach
+    </div>
 
    </div>
 </div>
