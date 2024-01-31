@@ -21,3 +21,4 @@ Route::post('/store', [GlobalFileController::class, 'store'])->middleware('auth'
 Route::delete('/delete/{id}', [GlobalFileController::class, 'destroy'])->middleware('auth')->name('delete');
 
 Route::post('/{file}/comment/store', [CommentController::class, 'store'])->middleware('auth')->name('comments.store');
+Route::post('/comments/{comment}/like', [CommentController::class, 'show'])->middleware('auth')->name('comments.show.like');

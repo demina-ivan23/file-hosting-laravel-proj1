@@ -89,6 +89,17 @@
       <div class="d-flex mt-4">
         {{$comment->text}}
       </div>
+      <div class="d-flex justify-content-start mt-4">
+        Likes: {{ $comment->likes}}
+      </div>
+      <div class="d-flex justify-content-end">
+        <form action="{{ route('admin.global-files.comments.show.like', ['comment' => $comment->id]) }}" method="POST">
+          @csrf
+          <button type="submit">
+              <img src="{{asset('storage/icons/thumbs-up.png')}}" alt="" width="25">
+          </button>
+      </form>
+      </div>
     </div>
     @endforeach
   </div>

@@ -25,6 +25,26 @@ class CommentService
             return $e->getMessage();
         }
     }
+    static function incrementLikes($id){
+            $authUser = static::findUser(auth()->id());
+            $comment = static::findComment($id);
+            if(!$authUser->likedComments->contains($comment->id))
+            {
+                $likes = $comment->likes + 1;
+                $comment->update(['likes' => $likes]);
+                $authUser->likedComments()->attach($comment->id);
+                return 'Comment Liked Successfully';
+            } else {
+                return 'You Have Already Liked That Comment';
+            }
+    }
+    static function findComment($id){
+        $comment = Comment::find($id);
+        if(!$comment){
+            abort(404);
+        }
+        return $comment;
+    }
     static function findUser($id){
         $user = User::find($id);
         if(!$user){

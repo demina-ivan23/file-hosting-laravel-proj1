@@ -19,4 +19,15 @@ class CommentController extends Controller
 
         }
     }
+    public function show($id){
+        $currentRoute = request()->route()->getName();
+        if($currentRoute === 'admin.global-files.comments.show.like'){
+            $result = CommentService::incrementLikes($id);
+            if(str_contains($result, 'Successfully')){
+                return redirect()->back()->with('success', $result);
+            } else {
+                return redirect()->back()->with('success', $result);
+            }
+        }
+    }
 }
