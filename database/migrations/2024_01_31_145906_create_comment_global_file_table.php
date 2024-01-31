@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('comment_global_file', function (Blueprint $table) {
             $table->id();
 
-            $table->unsignedBigInteger('comment_id');
+            $table->uuid('comment_id');
             $table->index('comment_id');
             $table->foreign('comment_id')
             ->references('id')

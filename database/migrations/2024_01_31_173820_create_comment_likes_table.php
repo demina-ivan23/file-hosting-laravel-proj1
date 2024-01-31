@@ -21,7 +21,7 @@ return new class extends Migration
             ->on('users')
             ->onDelete('CASCADE');
 
-            $table->unsignedBigInteger('comment_id');
+            $table->uuid('comment_id');
             $table->index('comment_id');
             $table->foreign('comment_id')
             ->references('id')

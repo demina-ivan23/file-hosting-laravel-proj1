@@ -2,9 +2,10 @@
 
 namespace App\Services;
 
+use Exception;
 use App\Models\User;
 use App\Models\Comment;
-use Exception;
+use Illuminate\Support\Str;
 
 class CommentService
 {
@@ -12,7 +13,6 @@ class CommentService
     static function storeComment($file, $request)
     {
         try{
-
             $authUser = static::findUser(auth()->id());
             $comment = Comment::create([
                 'text' => $request['text'],
