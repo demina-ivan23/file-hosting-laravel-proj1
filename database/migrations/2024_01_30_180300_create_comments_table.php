@@ -21,13 +21,15 @@ return new class extends Migration
             $table->index('user_id');
             $table->foreign('user_id')
             ->references('id')
-            ->on('users');
+            ->on('users')
+            ->onDelete('CASCADE');
 
             $table->unsignedBigInteger('global_file_id');
             $table->index('global_file_id');
             $table->foreign('global_file_id')
             ->references('id')
-            ->on('global_files');
+            ->on('global_files')
+            ->onDelete('CASCADE');
 
             $table->timestamps();
         });

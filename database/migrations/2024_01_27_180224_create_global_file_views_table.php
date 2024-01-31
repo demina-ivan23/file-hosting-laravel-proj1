@@ -18,13 +18,15 @@ return new class extends Migration
             $table->index('viewer_id');
             $table->foreign('viewer_id')
             ->references('id')
-            ->on('users');
+            ->on('users')
+            ->onDelete('CASCADE');
 
             $table->unsignedBigInteger('global_file');
             $table->index('global_file');
             $table->foreign('global_file')
             ->references('id')
-            ->on('users');
+            ->on('global_files')
+            ->onDelete('CASCADE');
             
             $table->timestamps();
         });
