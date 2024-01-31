@@ -49,15 +49,14 @@
           <div class="mt-3">Views: {{$file->views}}</div>
         </div>
     </div>
-    <form method="POST" action="{{route('admin.global-files.comments.store', ['file' => $file->publicId])}}" class="border border-gray-300 bg-gray-100 p-6 rounded-xl">
+    <form method="POST" action="{{route('admin.global-files.comments.store', ['file' => $file->publicId])}}" class="mt-20 ml-3 mr-3">
       @csrf
    
-      <header class="flex items-center">
-        <img src="/users/profiles/images/user.png" width="105" height="105"  alt="">
+      <header class="d-flex justify-content-center">
+        <img src="/users/profiles/images/user.png" width="50" height="50"  alt="" class="mr-5">
 
-   
         <h2 class="ml-3">
-        Leave Your comment about this post
+        Leave Your Comment About This File
       </h2>
       </header>
    
@@ -71,20 +70,28 @@
           
       </div>
       <div class="flex justify-end pt-6">
-        <button class="btn btn-primary">Post</button>
+        <button class="btn btn-primary mr-5">Post</button>
       </div>
    
     </form>
-    <div class="card-body">
-      @foreach ($file->comments as $comment)
-          <div class="d-flex">
-            {{$comment->text}}
-          </div>
-          <div class="d-flex">
+    <div class="mb-5">
+      @foreach ($file->comments()->latest()->get() as $comment)
+      <div class="card-body border border-gray-200 rounded-xl mt-5 ml-3 mr-3">
+      <div class="d-flex">
+        <img src="/users/profiles/images/user.png" width="30" height="30"  alt="" class="mr-5">
+        <div>
+          <h5>
             {{$comment->author->name}}
-          </div>
-      @endforeach
+          </h5>
+        </div>
+      </div>
+
+      <div class="d-flex mt-4">
+        {{$comment->text}}
+      </div>
     </div>
+    @endforeach
+  </div>
 
    </div>
 </div>
