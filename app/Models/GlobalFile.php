@@ -23,6 +23,44 @@ class GlobalFile extends Model
     }
     public function scopeFilter($query)
     {
+        if(request()->has('sort_by')) {
+            $sortField = request()->input('sort_by');
+        
+            if ($sortField == 'latest') {
+                $query->latest();
+            } elseif ($sortField == 'oldest') {
+                $query->oldest();
+            } elseif ($sortField == 'most-viewed') {
+                $query->orderBy('views', 'desc');
+           
+            }
+             elseif ($sortField == 'most-liked') {
+                $query->orderBy('likes', 'desc');
+           
+            }
+            elseif ($sortField == 'most-downloaded') {
+                $query->orderBy('downloads', 'desc');
+           
+            }
+            elseif ($sortField == 'least-viewed') {
+                $query->orderBy('views', 'asc');
+           
+            }
+            elseif ($sortField == 'least-liked') {
+                $query->orderBy('likes', 'asc');
+           
+            }
+            elseif ($sortField == 'least-downloaded') {
+                $query->orderBy('downloads', 'asc');
+           
+            } else {
+                //
+            }
+        }
+        else {
+            return $query->latest();
+        }
+
         return $query;
     }
 }

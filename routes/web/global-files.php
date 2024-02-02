@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\GlobalFiles\GlobalFileController;
 use App\Http\Controllers\CommentController;
 
 Route::get('/public', [GlobalFileController::class, 'index'])->name('public');
+
 Route::get('/protected', [GlobalFileController::class, 'index'])->middleware('auth')->name('protected');
 
 Route::get('/show/{file}', [GlobalFileController::class, 'show'])->name('show');

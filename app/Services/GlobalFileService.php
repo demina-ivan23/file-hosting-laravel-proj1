@@ -16,16 +16,16 @@ class GlobalFileService
 
     static function getAllPublicFiles()
     {
-        return GlobalFile::where('isPublic', true)->filter()->latest()->paginate(4);
+        return GlobalFile::where('isPublic', true)->filter()->paginate(4);
     }
     static function getAllProtectedFiles()
     {
         $authUser = static::findUser(auth()->id());
-        $files = GlobalFile::where('isPublic', false)->filter();
+        $files = GlobalFile::where('isPublic', false);
         $filteredFiles = $files->filter(function ($file) use ($authUser) {
             return $file->owner === $authUser->id ||
                 ($file->owner->contacts->contains($authUser->id) && !$file->owner->blacklist->contains($authUser->id));
-        })->filter()->latest()->paginate(4);
+        })->filter()->paginate(4);
 
         return $filteredFiles;
     }
