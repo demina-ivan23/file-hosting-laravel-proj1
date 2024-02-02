@@ -9,8 +9,8 @@ use App\Http\Controllers\Admin\Files\PersonalFilesController;
 
 
 Route::get('/', [FilesController::class, 'index'])->name('dashboard');
-Route::get('/received', [FilesController::class, 'index'])->name('received');
-Route::get('/sent', [FilesController::class, 'index'])->name('sent');
+Route::get("?filter_received_files={id}", [FilesController::class, 'index'])->name('received');
+Route::get("?filter_sent_files={id}", [FilesController::class, 'index'])->name('sent');
 
 Route::get('/download/{file}', [FilesController::class, 'show'])->name('show');
 Route::get('/download/{filePubId}/protected', [FilesController::class, 'show'])->name('pubid.show.protected');

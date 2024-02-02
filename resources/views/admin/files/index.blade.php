@@ -38,8 +38,8 @@
                   Filter
                 </button>
                 <ul class="dropdown-menu">
-                  <li><a class="dropdown-item" href="{{route('admin.files.received')}}">Received Files</a></li>
-                  <li><a class="dropdown-item" href="{{route('admin.files.sent')}}">Sent Files</a></li>
+                  <li><a class="dropdown-item" href="{{route('admin.files.received', ['id' => 'all'])}}">Received Files</a></li>
+                  <li><a class="dropdown-item" href="{{route('admin.files.sent', ['id' => 'all'])}}">Sent Files</a></li>
                   <form action="#" method="GET">
                     <li><a class="dropdown-item" href="{{route('admin.files.dashboard')}}">Show All Files</a></li>
                   </form>
@@ -62,7 +62,7 @@
           @endforeach
           <div class="mt-5">
           
-            {{$files->links()}}
+            {{$files->appends(request()->except('page'))->links()}}
           </div> 
           @endif
           
