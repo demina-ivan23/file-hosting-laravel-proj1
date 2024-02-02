@@ -58,9 +58,9 @@ class ZipArchiveMaker implements ArchiveInterface
             // Close the zip archive
             $zip->close();
 
-            foreach($paths as  $path){
-                $this->fileUploader->deleteFile(str_replace(['/', '\\'], DIRECTORY_SEPARATOR , $path));
-            }
+            // foreach($paths as  $path){
+            //     $this->fileUploader->deleteFile(str_replace(['/', '\\'], DIRECTORY_SEPARATOR , $path));
+            // }
 
             // Write the zip contents to the storage file
             Storage::put($zipFilePath, file_get_contents($tempZipFile));

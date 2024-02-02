@@ -14,11 +14,9 @@
    <div class="card mt-3">
     <div class="card-body">
         <div class="d-flex justify-content-center align-items-center">
-            @if ($file->title)
-            <h3>{{$file->title}}</h3>
-            @else
-                <h3>Untitled</h3>
-            @endif
+    
+            <h3>{{$file->title ?? 'Untitled' }}</h3>
+           
         </div>
         <div class="mt-3"><h5>Path: {{$file->path}}</h5></div>
         @if ($file->category)
@@ -31,19 +29,40 @@
         @else
         <div class="mt-2">No description</div> 
         @endif
+        @if ($extracted_files)
+        @foreach($extracted_files as $extr_file)
+        @if(Str::endsWith($extr_file, ['.jpg', '.jpeg', '.png', '.gif']))
+        <div class="d-flex justify-content-center align-items-center mt-3">
+          <img src="{{ asset('storage/' . $extr_file)}}" alt="" style="max-width: 90%; height: auto;">
+        </div>
+        @elseif(Str::endsWith($extr_file, ['.mp4', '.avi', '.mov']))
+        <div class="d-flex justify-content-center align-items-center mt-3 ">
+          <video width="750" height="450" controls autoplay muted>
+            <source src="{{ asset('storage/' . $extr_file) }}" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        </div>
+        @else
+            <p>Unsupported file type: {{ $extr_file }}</p>
+        @endif
+    @endforeach
+    
+        @else
+            
         @if ($file->mimeType === 'video/mp4')
         <div class="d-flex justify-content-center align-items-center mt-3 ">
           <video width="750" height="450" controls autoplay muted>
             <source src="{{ asset('storage/' . $file->path) }}" type="video/mp4">
-            Your browser does not support the video tag.
-        </video>
-        </div>
-        @endif
-        @if (str_contains($file->mimeType, 'image'))
-        <div class="d-flex justify-content-center align-items-center mt-3">
-          <img src="{{ asset('storage/' . $file->path)}}" alt="" style="max-width: 90%; height: auto;">
-        </div>
-        @endif
+              Your browser does not support the video tag.
+            </video>
+          </div>
+          @endif
+          @if (str_contains($file->mimeType, 'image'))
+          <div class="d-flex justify-content-center align-items-center mt-3">
+            <img src="{{ asset('storage/' . $file->path)}}" alt="" style="max-width: 90%; height: auto;">
+          </div>
+          @endif
+          @endif
    
         <div class="d-flex justify-content-end align-items-center">
           <div class="mt-3">Views: {{$file->views}}</div>

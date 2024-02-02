@@ -68,12 +68,17 @@ class GlobalFileController extends Controller
         if($currentRoute === 'admin.global-files.show')
         {
             $file = GlobalFileService::getFileByPubId($id);
+            if($file->mimeType === "application/zip"){
+                $files = GlobalFileService::getFilesFromArchive($file);
+            return view('admin.global-files.show', ['file' => $file, 'extracted_files' => $files]);
+            }
             GlobalFileService::incrementViews($file);
-            return view('admin.global-files.show', ['file' => $file]);
+            return view('admin.global-files.show', ['file' => $file, 'extracted_files' => null]);
         }
         if($currentRoute === 'admin.global-files.show.like')
         {
             $file = GlobalFileService::getFileByPubId($id);
+            
             $message = GlobalFileService::incrementLikes($file);
             return redirect()->back()->with('success', $message);
         }

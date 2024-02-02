@@ -2,12 +2,16 @@
 
 namespace App\Services;
 
+use PharData;
 use Exception;
+use ZipArchive;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Message;
 use App\Models\GlobalFile;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 use App\Services\ArchiveMakers\TarArchiveMaker;
 use App\Services\ArchiveMakers\ZipArchiveMaker;
 
@@ -77,7 +81,6 @@ class GlobalFileService
     }
     static function getFileByPubId($publicId)
     {
-
         $file = GlobalFile::where('publicId', $publicId)->first();
         if (!$file) {
             abort(404);
@@ -111,7 +114,6 @@ class GlobalFileService
                 $fileloader = new FileUploadService();
                 $path = $fileloader->UploadFile($data['files'][0]);
             }
-           
         } else {
             return 'No Files Selected';
         }
@@ -133,15 +135,36 @@ class GlobalFileService
         $authUser->ownedGlobalFiles()->attach($file);
         return 'Public File Uploaded Successfully';
     }
-    static function deleteFile($id){
+    static function getFilesFromArchive($file)
+    {
+        $file_path = public_path('storage\\' . $file->path);
+        $file_path = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $file_path);
+        if ($file->mimeType === "application/zip") {
+            $zip = new ZipArchive;
+            // Open the archive
+            if ($zip->open($file_path) === true) {
+                // Get the list of files in the archive
+                $files = [];
+                for ($i = 0; $i < $zip->numFiles; $i++) {
+                    // dd($zip->getNameIndex($i));
+                    $files[] = $zip->getNameIndex($i);
+                }
+
+                // Close the archive
+                $zip->close();
+                return $files;
+            }
+        }
+    }
+    static function deleteFile($id)
+    {
         $file = GlobalFile::where('publicId', $id)->first();
         $authUser = static::findUser(auth()->id());
-        if(!$file)
-        {
+        if (!$file) {
             abort(404);
         }
 
-        if($file->owner->id === $authUser->id){
+        if ($file->owner->id === $authUser->id) {
             $fileloader = new FileUploadService();
             $fileloader->deleteFile(str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $file->path));
             $file->delete();
@@ -152,15 +175,13 @@ class GlobalFileService
             ]);
             $authUser->messages()->attach($message_to_owner);
             return 'File Deleted Successfully';
-        }
-        else{
+        } else {
             return 'You Are Not The Owner Of This File';
         }
     }
     static function incrementViews($file)
     {
-        if(auth()->id())
-        {
+        if (auth()->id()) {
 
             $authUser = static::findUser(auth()->id());
             if (!$authUser->viewedGlobalFiles->contains($file->id)) {
@@ -174,8 +195,7 @@ class GlobalFileService
     }
     static function incrementDownloads($file)
     {
-        if(auth()->id())
-        {
+        if (auth()->id()) {
             $authUser = static::findUser(auth()->id());
             if (!$authUser->downloadedGlobalFiles->contains($file->id)) {
                 $downloads = $file->downloads + 1;
@@ -188,8 +208,7 @@ class GlobalFileService
     }
     static function incrementLikes($file)
     {
-        if(auth()->id())
-        {
+        if (auth()->id()) {
             $authUser = static::findUser(auth()->id());
             if (!$authUser->likedGlobalFiles->contains($file->id)) {
                 $likes = $file->likes + 1;
@@ -197,7 +216,7 @@ class GlobalFileService
                 $authUser->likedGlobalFiles()->attach($file->id);
                 return 'You Have Successfully Liked A Global File';
             } else {
-                return 'You Have Already Liked The File';  
+                return 'You Have Already Liked The File';
             }
         }
     }
