@@ -55,11 +55,12 @@
           @foreach ($files as $file)             
           @include('admin.global-files.components.file-card', ['file' => $file])     
           @endforeach
-          @endif 
-    
+          
+          
           <div class="mt-5">
-            {{$files->links()}}
+            {{$files->appends(request()->except('page'))->links()}}
           </div>
+          @endif 
 </div>
 
 @endsection

@@ -57,7 +57,7 @@
           @include('admin.global-files.components.file-card', ['file' => $file])     
           @endforeach
           <div class="mt-5">
-              {{$files->links()}}
+              {{$files->appends(request()->except('page'))->links()}}
           </div>
           @endif
           
