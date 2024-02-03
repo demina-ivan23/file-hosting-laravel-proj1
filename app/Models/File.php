@@ -26,8 +26,25 @@ class File extends Model
     {
 
         $authUser = User::find(auth()->user()->id);
-
-
+        if (request()->has('search')) {
+            $query->where(function ($query) {
+                $search = request('search');
+    
+                $query
+                    ->where('title', 'like', '%' . $search . '%')
+                    ->orWhere('description', 'like', '%' . $search . '%')
+                    ->orWhere('category', 'like', '%' . $search . '%')
+                    ->orWhereHas('sender', function ($senderQuery) use ($search) {
+                        $senderQuery->where('name', 'like', '%' . $search . '%')
+                        ->orWhere('email', 'like', '%' . $search . '%');
+                    })
+                    ->orWhereHas('receiver', function ($receiverQuery) use ($search) {
+                        $receiverQuery->where('name', 'like', '%' . $search . '%')
+                        ->orWhere('email', 'like', '%' . $search . '%');
+                    })
+                    ->orWhere('path', 'like', '%' . $search . '%');
+            });
+        }
         if (request('filter_sent_files')) {
 
             if (request('filter_sent_files') !== 'all') {

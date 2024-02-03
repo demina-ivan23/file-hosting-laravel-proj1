@@ -11,6 +11,12 @@
         {{ session('error') }}
       </div>
   @endif
+  <form method="GET" action="{{route('admin.files.personal.dashboard')}}">
+    <div class="input-group mb-3">
+      <input type="text" class="form-control" name="search">
+      <button class="input-group-text" type="submit">Search</button>
+    </div>
+    </form>
     <div class="card mt-4">
         <div class="card-body">
           <div class="d-flex">
@@ -41,7 +47,7 @@
           @endforeach
           <div class="mt-5">
           
-            {{$files->links()}}
+            {{$files->appends(request()->except('page'))->links()}}
           </div>
           @endif 
     

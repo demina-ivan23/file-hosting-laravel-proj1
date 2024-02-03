@@ -19,7 +19,9 @@ class PersonalFileService
         $files = File::where(function ($query) use ($authUser) {
             $query->where('sender_id', $authUser->id)
                 ->where('receiver_id', $authUser->id);
-        })->latest()->get();
+        })->filter()
+        ->latest()
+        ->paginate(5);
         return $files;
     }
     static function findUser($id)

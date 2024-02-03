@@ -23,7 +23,7 @@ class FileService
             })
             ->filter()
             ->latest()
-            ->paginate(10);
+            ->paginate(5);
         return $files;
     }
     static function getSentFiles()
