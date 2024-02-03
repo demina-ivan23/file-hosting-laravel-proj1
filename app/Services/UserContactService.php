@@ -138,7 +138,7 @@ class UserContactService
     static function getContacts()
     {
         $authUser = User::find(auth()->id());
-        return $authUser->contacts;
+        return $authUser->contacts()->filter()->paginate(5);
     }
     static function blockUser($request, $id)
     {

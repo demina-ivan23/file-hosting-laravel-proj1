@@ -88,4 +88,14 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Comment::class, 'comment_likes', 'user_id', 'comment_id');
     }
+    public function scopeFilter($query)
+    {
+        $query->where(function ($query) {
+            $search = request('search');
+            $query
+                ->where('name', 'like', '%' . $search . '%')
+                ->orWhere('email', 'like', '%' . $search . '%');
+        });
+    }
 }
+
