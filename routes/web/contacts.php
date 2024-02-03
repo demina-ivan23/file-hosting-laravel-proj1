@@ -12,8 +12,6 @@ Route::get('/', [UserContactController::class, 'index'])->name('dashboard');
 Route::get('/create', [UserContactController::class, 'create'])->name('create');
 Route::post('/store', [UserContactController::class, 'store'])->name('store');
 Route::get('/show/{user}', [UserContactController::class, 'show'])->name('show');
-Route::get('/show/{user}/received', [UserContactController::class, 'show'])->name('show.received');
-Route::get('/show/{user}/sent', [UserContactController::class, 'show'])->name('show.sent');
 
 
 Route::post('/update/{user}', [UserContactController::class, 'update'])->name('update');

@@ -37,8 +37,8 @@
                   Filter
                 </button>
                 <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="{{route('admin.contacts.show.sent', ['user' => $contact]) }}">Show Sent Files</a></li>
-                    <li><a class="dropdown-item" href="{{ route('admin.contacts.show.received', ['user' => $contact])}}">Show Received Files</a></li>
+                    <li><a class="dropdown-item" href="{{route('admin.contacts.show', ['user' => $contact->id, 'filter_sent_files' => $contact->id]) }}">Show Sent Files</a></li>
+                    <li><a class="dropdown-item" href="{{ route('admin.contacts.show', ['user' => $contact->id, 'filter_received_files' => $contact->id])}}">Show Received Files</a></li>
                   <form action="#" method="GET">
                     <li><a class="dropdown-item" href="{{route('admin.contacts.show', ['user' => $contact->id])}}">Show All Files</a></li>
                   </form>
