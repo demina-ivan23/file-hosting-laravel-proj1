@@ -11,6 +11,12 @@
     {{ session('error') }}
   </div>
 @endif
+<form method="GET" action="{{route('admin.contacts.show', ['user' => $contact->id])}}">
+  <div class="input-group mb-3">
+    <input type="text" class="form-control" name="search">
+    <button class="input-group-text" type="submit">Search</button>
+  </div>
+  </form>
   <a href="{{route('admin.contacts.dashboard')}}" class="btn btn-light">Go Back To Contacts</a>
     <div class="card mt-4">
         <div class="card-body">
