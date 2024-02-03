@@ -23,6 +23,21 @@ class GlobalFile extends Model
     }
     public function scopeFilter($query)
     {
+        if (request()->has('search')) {
+            $query->where(function ($query) {
+                $search = request('search');
+    
+                $query
+                    ->where('title', 'like', '%' . $search . '%')
+                    ->orWhere('description', 'like', '%' . $search . '%')
+                    ->orWhere('category', 'like', '%' . $search . '%')
+                    ->orWhereHas('owner', function ($ownerQuery) use ($search) {
+                        $ownerQuery->where('name', 'like', '%' . $search . '%')
+                        ->orWhere('email', 'like', '%' . $search . '%');
+                    })
+                    ->orWhere('path', 'like', '%' . $search . '%');
+            });
+        }
         if(request()->has('sort_by')) {
             $sortField = request()->input('sort_by');
         

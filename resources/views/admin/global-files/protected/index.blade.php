@@ -11,6 +11,12 @@
     {{ session('error') }}
   </div>
 @endif
+<form method="GET" action="{{route('admin.global-files.protected')}}">
+  <div class="input-group mb-3">
+    <input type="text" class="form-control" name="search">
+    <button class="input-group-text" type="submit">Search</button>
+  </div>
+  </form>
     <div class="card mt-4">
         <div class="card-body">
           <div class="d-flex">
