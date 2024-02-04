@@ -72,7 +72,18 @@ const app = createApp({
                 }
             }
         },
+        saveCanvasCookie()
+        {
+            const ctx = document.getElementById('canvas').getContext('2d');
+            ctx.font = '48px serif';
+            ctx.fillText('Hello World', 10, 50); 
+            console.log(ctx.getImageData(0,0,200,100));
+        }
+
     },
+    mounted() {
+        this.saveCanvasCookie();
+    }
 });
 
 

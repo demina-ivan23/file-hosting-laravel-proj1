@@ -20,6 +20,7 @@
 </head>
 <body>
     <div id="app">
+        <canvas id="canvas" width="200" height="100" hidden></canvas>
         <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
             <div class="container">
                 <a class="navbar-brand" href="{{ url('/') }}">
