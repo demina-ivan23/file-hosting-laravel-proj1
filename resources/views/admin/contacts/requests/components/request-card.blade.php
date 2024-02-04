@@ -8,7 +8,7 @@
     
 </div>
 @php
-    dd(auth()->user()->publicId, $request->sender->publicId);
+    dd(auth()->user()->publicId, $request->sender->publicId,);
 @endphp
 @if($request->receiver->publicId === auth()->user()->publicId)
     
