@@ -12,17 +12,17 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('user_contact_requests', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->uuid('sender_id');
+            $table->id();
+            $table->unsignedBigInteger('sender_id');
             $table->index('sender_id');
             $table->foreign('sender_id')
-            ->references('publicId')
+            ->references('id')
             ->on('users')
             ->onDelete('CASCADE');
-            $table->uuid('receiver_id');
+            $table->unsignedBigInteger('receiver_id');
             $table->index('receiver_id');
             $table->foreign('receiver_id')
-            ->references('publicId')
+            ->references('id')
             ->on('users')
             ->onDelete('CASCADE');
             $table->timestamps();

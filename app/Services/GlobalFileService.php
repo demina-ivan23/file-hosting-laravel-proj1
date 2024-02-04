@@ -220,9 +220,10 @@ class GlobalFileService
             }
         }
     }
-    static function findUser($publicId){
-        $user = User::where('publicId', $publicId)->first();
-        if(!$user){
+    static function findUser($id)
+    {
+        $user = User::find($id);
+        if (!$user) {
             abort(404);
         }
         return $user;

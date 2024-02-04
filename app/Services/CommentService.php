@@ -13,11 +13,11 @@ class CommentService
     static function storeComment($file, $request)
     {
         try{
-            $authUser = static::findUser(auth()->user()->publicId);
+            $authUser = static::findUser(auth()->id());
             $comment = Comment::create([
                 'text' => $request['text'],
-                'user_id' => $authUser->publicId,
-                'global_file_id' => $file->publicId
+                'user_id' => $authUser->id,
+                'global_file_id' => $file->id
             ]);
             $file->comments()->attach($comment);  
             return 'Comment Created Successfully'; 
@@ -57,8 +57,8 @@ class CommentService
         }
         return $comment;
     }
-    static function findUser($publicId){
-        $user = User::where('publicId', $publicId)->first();
+    static function findUser($id){
+        $user = User::find($id);
         if(!$user){
             abort(404);
         }

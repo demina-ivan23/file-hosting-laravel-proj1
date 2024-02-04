@@ -126,12 +126,14 @@ class UserContactService
         }
     }
 
-    static function findUser($publicId){
-        $user = User::where('publicId', $publicId)->first();
-        if(!$user){
-            abort(404);
+    static function findUser($id)
+    {
+
+        $userToAdd = User::find($id);
+        if (!$userToAdd) {
+            throw new Exception("User Not Found, Id: {$id}");
         }
-        return $user;
+        return $userToAdd;
     }
     static function getContacts()
     {

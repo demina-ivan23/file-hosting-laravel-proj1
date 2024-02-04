@@ -9,21 +9,23 @@ use App\Models\UserContactRequest;
 
 class UserContactRequestService
 {
-    static function getAllRequests($publicId)
+    static function getAllRequests($id)
     {
         try {
-            $authUser = static::findUser($publicId);
-            $requests = UserContactRequest::where(['sender_id' => $authUser->publicId])
-                ->orWhere(['receiver_id' => $authUser->publicId])->get();
+
+            $authUser = static::findUser($id);
+            $requests = UserContactRequest::where(['sender_id' => auth()->id()])
+                ->orWhere(['receiver_id' => $authUser->id])->get();
             return $requests;
         } catch (Exception $e) {
-            throw new Exception("{$e->getMessage()}");
+            throw new Exception($e->getMessage());
         }
     }
-    static function findUser($publicId){
-        $user = User::where('publicId', $publicId)->first();
-        if(!$user){
-            abort(404);
+    static function findUser($id)
+    {
+        $user = User::find($id);
+        if (!$user) {
+            throw new Exception('User Not Found');
         }
         return $user;
     }
@@ -32,45 +34,45 @@ class UserContactRequestService
         try{
 
             $data = $request->all();
-            $receiver = static::findUser($data['publicId']);
-            $sender = static::findUser(auth()->user()->publicId);
+            $receiver = static::findUser($data['id']);
+            $sender = User::find(auth()->id());
         $contact_request = UserContactRequest::where([
-            'sender_id' => $sender->publicId,
-            'receiver_id' => $receiver->publicId
+            'sender_id' => $sender->id,
+            'receiver_id' => $receiver->id
             ])->first();
             if ($contact_request) {
                 return 'You Have Already Sent A Request To This User';
             }
-            if ($sender->publicId === $receiver->publicId) {
+            if ($sender->id === $receiver->id) {
                 return 'You Are Already In Your Contact List :) XD';
             }
-            if ($receiver->contacts->contains($sender->pulicId)) {
+            if ($receiver->contacts->contains($sender)) {
                 return 'You Are Already In The User\'s Contact List';
             }
-            if ($receiver->blacklist->contains($sender->publicId) || $sender->blacklist->contains($receiver->publicId)) {
+            if ($receiver->blacklist->contains($sender->id) || $sender->blacklist->contains($receiver->id)) {
                 return 'You Have Either Blocked This User Or Have Been Blocked By Them (Or Both).
                 Unblock Them To Send A Request Or Ask Them To Unblock You (Depends On Who Blocked Whom)';
             }
             $contact_request = UserContactRequest::where([
-                'sender_id' => $receiver->publicId,
-                'receiver_id' => $sender->publicId
+                'sender_id' => $receiver->id,
+                'receiver_id' => $sender->id
                 ])->first();
         if ($contact_request) {
             return 'This Person Have Already Sent You The Request. Check Your Requests Page';
         }
         $contact_request = UserContactRequest::create([
-            'sender_id' => $sender->publicId,
-            'receiver_id' => $receiver->publicId
+            'sender_id' => $sender->id,
+            'receiver_id' => $receiver->id
         ]);
         $message_to_receiver = Message::create([
             'text' => "User With Email $sender->email Have Sent You A Contact Request. Check Your Requests Page",
             'system' => true,
-            'userReceiver' => $receiver->publicId
+            'userReceiver' => $receiver->id
         ]);
         $message_to_sender = Message::create([
-            'text' => "You Sent A Contact Request To User With Id Of $receiver->publicId",
+            'text' => "You Sent A Contact Request To User With Id Of $receiver->id",
             'system' => true,
-            'userReceiver' => $sender->publicId
+            'userReceiver' => $sender->id
         ]);
         $receiver->messages()->attach($message_to_receiver);
         $sender->messages()->attach($message_to_sender);
@@ -88,9 +90,9 @@ class UserContactRequestService
                 $message_to_sender = Message::create([
                     'text' => "You Have Canceled The Request To The User With Id Of {$contact_request->receiver->id}",
                     'system' => true,
-                    'userReceiver' => $contact_request->sender->publicId  
+                    'userReceiver' => $contact_request->sender->id  
                 ]);
-                $sender = static::findUser($contact_request->sender->publicId);
+                $sender = static::findUser($contact_request->sender->id);
                 $sender->messages()->attach($message_to_sender);
                 $contact_request->delete();
                 return 'Request Canceled Successfully';
@@ -99,16 +101,16 @@ class UserContactRequestService
                 $message_to_sender = Message::create([
                     'text' => "Your Request Was Denied By The User With Id Of {$contact_request->receiver->id}",
                     'system' => true,
-                    'userReceiver' => $contact_request->sender->publicId  
+                    'userReceiver' => $contact_request->sender->id  
                 ]);
                 $message_to_receiver = Message::create([
                     'text' => "You Have Denied The Request Of {$contact_request->sender->email}",
                     'system' => true,
-                    'userReceiver' => $contact_request->receiver->publicId  
+                    'userReceiver' => $contact_request->receiver->id  
                 ]);
-                $sender = static::findUser($contact_request->sender->publicId);
+                $sender = User::find($contact_request->sender->id);
                 $sender->messages()->attach($message_to_sender);
-                $receiver = static::findUser($contact_request->receiver->publicId);
+                $receiver = User::find($contact_request->receiver->id);
                 $receiver->messages()->attach($message_to_receiver);
                 $contact_request->delete();
                 return 'Request Declined Successfully';
@@ -121,7 +123,7 @@ class UserContactRequestService
         $request = UserContactRequest::find($id);
         if(!$request)
         {
-            abort(404);
+            throw new Exception('Request Not Found');
         }
         return $request;
     }

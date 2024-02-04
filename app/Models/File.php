@@ -25,7 +25,7 @@ class File extends Model
     public function scopeFilter($query)
     {
 
-        $authUser = User::find(auth()->id());
+        $authUser = User::find(auth()->user()->id);
         if (request()->has('search')) {
             $query->where(function ($query) {
                 $search = request('search');
@@ -48,11 +48,11 @@ class File extends Model
         if (request('filter_sent_files')) {
 
             if (request('filter_sent_files') !== 'all') {
-                $query->where('sender_id', $authUser->publicId)
+                $query->where('sender_id', $authUser->id)
                     ->where('receiver_id', request('filter_sent_files'));
                     // dd('hi');
             } else {
-                $query->where('sender_id', $authUser->publicId);
+                $query->where('sender_id', $authUser->id);
             }
         }
 
@@ -60,9 +60,9 @@ class File extends Model
 
             if (request('filter_received_files') !== 'all') {
                 $query->where('sender_id', request('filter_received_files'))
-                    ->where('receiver_id', $authUser->publicId);
+                    ->where('receiver_id', $authUser->id);
             } else {
-                $query->where('receiver_id', $authUser->publicId);
+                $query->where('receiver_id', $authUser->id);
             }
         }
         return $query;
