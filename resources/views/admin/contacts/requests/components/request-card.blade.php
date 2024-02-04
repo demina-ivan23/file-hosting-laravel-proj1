@@ -5,8 +5,12 @@
 
                     <div class="col-sm-3 d-flex align-items-center justify-content-center">
 <img src="/users/profiles/images/user.png" width="105" height="105"  alt="">  
-                    </div>
-@if($request->receiver->id === auth()->id())
+    
+</div>
+@php
+    dd(auth()->user()->publicId, $request->sender->publicId,);
+@endphp
+@if($request->receiver->publicId === auth()->user()->publicId)
     
 <div class="col-sm-5">
 
@@ -26,7 +30,7 @@
         <input type="hidden" value="{{$request->sender_id}}" name="id">
         <button class="btn btn-outline-primary" type="submit">Accept</button>
     </form>
-    <form action="{{route('admin.contacts.requests.delete', ['id' => $request->id, 'state' => 'declined'])}}" method="POST">
+    <form action="{{route('admin.contacts.requests.delete', ['publicId' => $request->publicId, 'state' => 'declined'])}}" method="POST">
     @csrf
     @method('DELETE')
     
@@ -35,14 +39,14 @@
     <a class="btn btn-outline-primary" href="#">Decline And Block User</a>
 </div>
 @endif
-@if($request->sender->id === auth()->id())
+@if($request->sender->publicId === auth()->user()->publicId)
 <div class="col-sm-6">
 
     {{-- Enshure that request sender doesn't
     get any personal information about the
     receiver unless receiver accepts the request --}}
     <li>
-        <strong>Reciever's Id: {{ $request->receiver->id }}</strong>
+        <strong>Reciever's Id: {{ $request->receiver->publicId }}</strong>
     </li>
     
          
@@ -50,7 +54,7 @@
     
     <div class="col-sm-3 d-flex justify-content-center align-items-center justify-content-between">
          
-    <form action="{{route('admin.contacts.requests.delete', ['id' => $request->id, 'state' => 'canceled'])}}" method="POST">
+    <form action="{{route('admin.contacts.requests.delete', ['publicId' => $request->publicId, 'state' => 'canceled'])}}" method="POST">
         @csrf
         @method('DELETE')
         <button class="btn btn-outline-primary" type="submit">Cancel Request</button>

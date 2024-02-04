@@ -13,17 +13,17 @@ return new class extends Migration
     {
         Schema::create('user_user', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id_1');
+            $table->uuid('user_id_1');
             $table->index('user_id_1');
             $table->foreign('user_id_1')
-            ->references('id')
+            ->references('punlicId')
             ->on('users')
             ->onDelete('CASCADE');
 
-            $table->unsignedBigInteger('user_id_2');
+            $table->uuid('user_id_2');
             $table->index('user_id_2');
             $table->foreign('user_id_2')
-            ->references('id')
+            ->references('publicId')
             ->on('users')
             ->onDelete('CASCADE');
 

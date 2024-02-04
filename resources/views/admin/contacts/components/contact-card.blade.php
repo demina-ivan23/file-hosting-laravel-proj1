@@ -25,7 +25,7 @@
                         @if (!$authUser->blacklist->contains($contact->id))
                         <li>
                                 
-                            <form action="{{route('admin.contacts.update', ['user' => $contact->id])}}" method="POST">
+                            <form action="{{route('admin.contacts.update', ['publicId' => $contact->publicId])}}" method="POST">
                                 @csrf
                                 <input type="hidden" name="blocking" value="{{true}}">
                                 <button class="dropdown-item" type="submit" onclick="return confirm('Are You Sure You Want To Block The Contact?')">Block User</button>
@@ -35,7 +35,7 @@
                         @if ($authUser->blacklist->contains($contact->id))
                             
                         <li>
-                            <form action="{{route('admin.contacts.update', ['user' => $contact->id])}}" method="POST">
+                            <form action="{{route('admin.contacts.update', ['publicId' => $contact->publicId])}}" method="POST">
                                 @csrf
                                 <input type="hidden" name="blocking" value="{{false}}">
                                 <button class="dropdown-item" type="submit" >Unblock User</button>
@@ -43,7 +43,7 @@
                         </li>
                         @endif
                         <li>
-                            <form action="{{route('admin.contacts.delete', ['user' => $contact->id])}}" method="POST">
+                            <form action="{{route('admin.contacts.delete', ['publicId' => $contact->publicId])}}" method="POST">
                                 @csrf
                                 @method('DELETE')
                                 <button class="dropdown-item" type="submit" onclick="return confirm('Do You Want To Delete This Contact?')">Delete Contact</button>

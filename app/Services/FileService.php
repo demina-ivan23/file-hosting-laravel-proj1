@@ -58,13 +58,13 @@ class FileService
         }
     }
 
-    static function sendFile($request, $id)
+    static function sendFile($request, $publicId)
     {
         try {
 
-            $authUser = static::findUser(auth()->id());
+            $authUser = static::findUser(auth()->user()->publicId);
             $data = $request->all();
-            $userReciever = static::findUser($id);
+            $userReciever = static::findUser($publicId);
             if ($request->hasFile('files')) {
                 $fileloader = new FileUploadService();
                 $path = $fileloader->UploadFile($data['files'][0]);
@@ -74,28 +74,28 @@ class FileService
                     'description' => $data['description'],
                     'category' => $data['category'],
                     'state' => 'active',
-                    'sender_id' => $authUser->id,
-                    'receiver_id' => $userReciever->id
+                    'sender_id' => $authUser->publicId,
+                    'receiver_id' => $userReciever->publicId
                 ]);
                 $authUser->sentFiles()->attach($file, ['userReceiver' => $userReciever->id]);
-                //Notice: make messages for each sent/received file here
+
                 return 'File Uploaded Successfully';
             }
         } catch (Exception $e) {
             return $e->getMessage();
         }
     }
-    static function findUser($id)
+    static function findUser($publicId)
     {
-        $user = User::find($id);
+        $user = User::where('publicId', $publicId)->first();
         if (!$user) {
-            throw new Exception("User Not Found, Id: {$id}");
+            abort(404);
         }
         return $user;
     }
     static function getPath($id)
     {
-        $authUser = static::findUser(auth()->id());
+        $authUser = static::findUser(auth()->user()->publicId);
         if ($authUser->sentFiles->contains($id) || $authUser->receivedFiles->contains($id)) {
             $file = File::find($id);
             $file_path = public_path('storage\\' . $file->path);
@@ -103,7 +103,7 @@ class FileService
             return $file_path;
         }
     }
-    static function getPathByPubId($publicId)
+    static function getPathOfGlobal($publicId)
     {
         try {
 
@@ -123,31 +123,31 @@ class FileService
             return false;
         }
     }
-    static function deleteFile($id)
+    static function deleteFile($publicId)
     {
-        $file = File::find($id);
+        $file = File::where('publicId', $publicId);
         if (!$file) {
             abort(404);
         }
         $receiver = $file->receiver;
         $sender = $file->sender;
-        if ($file->sender->id === auth()->id() xor $file->receiver->id === auth()->id()) {
+        if ($file->sender->publicId === auth()->user()->publicId || $file->receiver->punblicId === auth()->user()->publicId) {
             $fileloader = new FileUploadService();
             $fileloader->deleteFile(str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $file->path));
             $file->delete();
 
 
-            if ($file->sender->id === auth()->id() && $file->receiver->id !== auth()->id()) {
+            if ($file->sender->publicId === auth()->user()->publicId && $file->receiver->publicId !== auth()->user()->publicId) {
 
                 $message_to_sender = Message::create([
                     'text' => "You Deleted A File That Was Sent To $receiver->email By You",
                     'system' => true,
-                    'userReceiver' => $sender->id
+                    'userReceiver' => $sender->publicId
                 ]);
                 $message_to_receiver = Message::create([
                     'text' => "User $sender->email Have Deleted The File They Sent You",
                     'system' => true,
-                    'userReceiver' => $receiver->id
+                    'userReceiver' => $receiver->publicId
                 ]);
             }
 
@@ -156,12 +156,12 @@ class FileService
                 $message_to_sender = Message::create([
                     'text' => "User $receiver->email Have Deleted A File That Was Sent To Them By You",
                     'system' => true,
-                    'userReceiver' => $sender->id
+                    'userReceiver' => $sender->publicId
                 ]);
                 $message_to_receiver = Message::create([
                     'text' => "You Have Deleted The File That Was Sent To You By $sender->email",
                     'system' => true,
-                    'userReceiver' => $receiver->id
+                    'userReceiver' => $receiver->publicId
                 ]);
             }
             $receiver->messages()->attach($message_to_receiver);

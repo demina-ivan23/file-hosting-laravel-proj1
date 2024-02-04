@@ -24,11 +24,10 @@ class PersonalFileService
         ->paginate(5);
         return $files;
     }
-    static function findUser($id)
-    {
-        $user = User::find($id);
-        if (!$user) {
-            throw new Exception('User Not Found');
+    static function findUser($publicId){
+        $user = User::where('publicId', $publicId)->first();
+        if(!$user){
+            abort(404);
         }
         return $user;
     }

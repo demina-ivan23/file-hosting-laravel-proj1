@@ -11,11 +11,11 @@ Route::get('/', [UserContactController::class, 'index'])->name('dashboard');
 
 Route::get('/create', [UserContactController::class, 'create'])->name('create');
 Route::post('/store', [UserContactController::class, 'store'])->name('store');
-Route::get('/show/{user}', [UserContactController::class, 'show'])->name('show');
+Route::get('/show/{publiId}', [UserContactController::class, 'show'])->name('show');
 
 
-Route::post('/update/{user}', [UserContactController::class, 'update'])->name('update');
-Route::delete('/delete/{user}', [UserContactController::class, 'destroy'])->name('delete');
+Route::post('/update/{publicId}', [UserContactController::class, 'update'])->name('update');
+Route::delete('/delete/{publicId}', [UserContactController::class, 'destroy'])->name('delete');
 
 
 
@@ -23,4 +23,4 @@ Route::delete('/delete/{user}', [UserContactController::class, 'destroy'])->name
 Route::get('/requests', [UserContactRequestController::class, 'index'])->name('requests.dashboard');
 Route::get('/requests/create', [UserContactRequestController::class, 'create'])->name('requests.create');
 Route::post('/requests/store', [UserContactRequestController::class, 'store'])->name('requests.store');
-Route::delete('/requests/delete/{id}/{state}', [UserContactRequestController::class, 'destroy'])->name('requests.delete');
+Route::delete('/requests/delete/{publicId}/{state}', [UserContactRequestController::class, 'destroy'])->name('requests.delete');

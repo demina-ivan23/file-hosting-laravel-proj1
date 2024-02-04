@@ -16,7 +16,7 @@ class UserContactRequestController extends Controller
      */
     public function index()
     {
-        $requests = UserContactRequestService::getAllRequests(auth()->id());
+        $requests = UserContactRequestService::getAllRequests(auth()->user()->publicId);
         return view('admin.contacts.requests.index', ['requests' => $requests]);
     }
 
