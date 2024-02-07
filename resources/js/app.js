@@ -72,13 +72,39 @@ const app = createApp({
                 }
             }
         },
-        saveCanvasCookie()
+        async saveCanvasCookie()
         {
             const ctx = document.getElementById('canvas').getContext('2d');
             ctx.font = '48px serif';
             ctx.fillText('Hello World', 10, 50); 
-            console.log(ctx.getImageData(0,0,200,100));
-        }
+            const imageData = ctx.getImageData(0,0,200,100).data;
+            // const cookieExists = await this.checkIfCookieExists(imageData);
+            // if (!cookieExists) {
+            //     this.saveCookieToDatabase(imageData);
+            // }
+        },
+        // async checkIfCookieExists(imageData) {
+        //     try {
+        //         const response = await axios.get('/api/check-cookie', {
+        //             params: { imageData: JSON.stringify(imageData) }
+        //         });
+        //         return response.data.exists; // Assuming your API returns a boolean 'exists' field
+        //     } catch (error) {
+        //         console.error('Error checking if cookie exists:', error);
+        //         return false; // Assume cookie doesn't exist in case of an error
+        //     }
+        // },
+        // async saveCookieToDatabase(imageData) {
+        //     try {
+        //         const response = await axios.post('/api/save-cookie', {
+        //             imageData: JSON.stringify(imageData)
+        //         });
+    
+        //         console.log('Cookie saving result:', response.data);
+        //     } catch (error) {
+        //         console.error('Error saving cookie:', error);
+        //     }
+        // },
 
     },
     mounted() {
