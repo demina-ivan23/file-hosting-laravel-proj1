@@ -27,7 +27,7 @@ return new class extends Migration
             ->on('users')
             ->onDelete('CASCADE');
 
-            $table->unsignedBigInteger('message');
+            $table->uuid('message');
             $table->index('message');
             $table->foreign('message')
             ->references('id')

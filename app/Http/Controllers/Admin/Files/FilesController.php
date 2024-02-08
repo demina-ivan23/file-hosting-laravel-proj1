@@ -21,21 +21,21 @@ class FilesController extends Controller
         if ($currentRoute === 'admin.files.dashboard') {
             $files = FileService::getAllFiles();
         }
-        if ($currentRoute === 'admin.files.received') {
-            $files = FileService::getReceivedFiles();
-        }
-        if ($currentRoute === 'admin.files.sent') {
-            $files = FileService::getSentFiles();
-        }
+        // if ($currentRoute === 'admin.files.received') {
+        //     $files = FileService::getReceivedFiles();
+        // }
+        // if ($currentRoute === 'admin.files.sent') {
+        //     $files = FileService::getSentFiles();
+        // }
         return view('admin.files.index', ['files' => $files]);
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create($id)
+    public function create($publicId)
     {
-        $contact = FileService::createFiles($id);
+        $contact = FileService::createFiles($publicId);
         return view('admin.files.create', ['contact_user' => $contact]);
     }
 

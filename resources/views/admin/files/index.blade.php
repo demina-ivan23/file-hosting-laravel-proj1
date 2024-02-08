@@ -44,8 +44,8 @@
                   Filter
                 </button>
                 <ul class="dropdown-menu">
-                  <li><a class="dropdown-item" href="{{route('admin.files.received', ['id' => 'all'])}}">Received Files</a></li>
-                  <li><a class="dropdown-item" href="{{route('admin.files.sent', ['id' => 'all'])}}">Sent Files</a></li>
+                  <li><a class="dropdown-item" href="{{route('admin.files.dashboard', ['id' => 'all'])}}">Received Files</a></li>
+                  <li><a class="dropdown-item" href="{{route('admin.files.dashboard', ['id' => 'all'])}}">Sent Files</a></li>
                   <form action="#" method="GET">
                     <li><a class="dropdown-item" href="{{route('admin.files.dashboard')}}">Show All Files</a></li>
                   </form>

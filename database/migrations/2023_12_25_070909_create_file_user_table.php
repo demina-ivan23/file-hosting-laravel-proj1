@@ -29,7 +29,7 @@ return new class extends Migration
             ->onDelete('CASCADE');
 
 
-            $table->unsignedBigInteger('file');
+            $table->uuid('file');
             $table->index('file');
             $table->foreign('file')
             ->references('id')

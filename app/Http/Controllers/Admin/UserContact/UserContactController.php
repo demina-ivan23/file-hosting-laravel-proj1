@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin\UserContact;
 
 
 use Illuminate\Http\Request;
+use App\Services\UserService;
 use App\Http\Controllers\Controller;
 use App\Services\UserContactService;
 use App\Http\Requests\UserContacts\StoreUserContactRequest;
@@ -24,7 +25,7 @@ class UserContactController extends Controller
      */
     public function create()
     {
-        return view('admin.contacts.create');
+        //
     }
 
     /**
@@ -44,20 +45,20 @@ class UserContactController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(string $publicId)
     {
         $currentRoute = request()->route()->getName();
-        $contact = UserContactService::findUser($id);
+        $contact = UserService::findUserByPublicId($publicId);
         if($currentRoute === 'admin.contacts.show'){
-            $files = UserContactService::getRelatedFiles($id);
+            $files = UserContactService::getRelatedFiles($publicId);
         }
-        if($currentRoute === 'admin.contacts.show.received')
-        {
-            $files= UserContactService::getReceivedFiles($id);
-        }
-        if($currentRoute === 'admin.contacts.show.sent'){
-            $files = UserContactService::getSentFiles($id);
-        }
+        // if($currentRoute === 'admin.contacts.show.received')
+        // {
+        //     $files= UserContactService::getReceivedFiles($id);
+        // }
+        // if($currentRoute === 'admin.contacts.show.sent'){
+        //     $files = UserContactService::getSentFiles($id);
+        // }
         return view('admin.contacts.show', ['contact' => $contact, 'files' => $files]);
     }
 
@@ -72,9 +73,9 @@ class UserContactController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, string $publicId)
     {
-       $result = UserContactService::blockUser($request, $id);
+       $result = UserContactService::blockUser($request, $publicId);
 
         
     if (str_contains($result, 'Blocked')) {
@@ -89,11 +90,11 @@ class UserContactController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $publicId)
     {   
-        $result = UserContactService::deleteContact($id);
+        $result = UserContactService::deleteContact($publicId);
         if(str_contains($result, 'Deleted Successfully')){
-            return redirect()->route('admin.contacts.deshboard')->with('success', $result);
+            return redirect()->route('admin.contacts.dashboard')->with('success', $result);
         }
         else{
             return redirect()->route('admin.contacts.dashboard')->with('error', $result);

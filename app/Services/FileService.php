@@ -7,6 +7,7 @@ use App\Models\File;
 use App\Models\User;
 use App\Models\Message;
 use App\Models\GlobalFile;
+use App\Services\UserService;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 
@@ -26,31 +27,31 @@ class FileService
             ->paginate(5);
         return $files;
     }
-    static function getSentFiles()
-    {
-        $files = File::where(function ($query) {
-            $query->where('sender_id', auth()->id());
-        })
-            ->filter()
-            ->latest()
-            ->paginate(10);
-        return $files;
-    }
-    static function getReceivedFiles()
-    {
-        $files = File::where(function ($query) {
-            $query->where('receiver_id', auth()->id());
-        })
-            ->filter()
-            ->latest()
-            ->paginate(10);
-        return $files;
-    }
+    // static function getSentFiles()
+    // {
+    //     $files = File::where(function ($query) {
+    //         $query->where('sender_id', auth()->id());
+    //     })
+    //         ->filter()
+    //         ->latest()
+    //         ->paginate(10);
+    //     return $files;
+    // }
+    // static function getReceivedFiles()
+    // {
+    //     $files = File::where(function ($query) {
+    //         $query->where('receiver_id', auth()->id());
+    //     })
+    //         ->filter()
+    //         ->latest()
+    //         ->paginate(10);
+    //     return $files;
+    // }
 
-    static function createFiles($id)
+    static function createFiles($publicId)
     {
-        $userToSendTo = static::findUser($id);
-        $userSending = static::findUser(auth()->id());
+        $userToSendTo = UserService::findUserByPublicId($publicId);
+        $userSending = UserService::findUser(auth()->id());
         if (Gate::allows('start-chat', [$userToSendTo, $userSending])) {
             return $userToSendTo;
         } else {
@@ -62,9 +63,9 @@ class FileService
     {
         try {
 
-            $authUser = static::findUser(auth()->id());
+            $authUser = UserService::findUser(auth()->id());
             $data = $request->all();
-            $userReciever = static::findUser($id);
+            $userReciever = UserService::findUser($id);
             if ($request->hasFile('files')) {
                 $fileloader = new FileUploadService();
                 $path = $fileloader->UploadFile($data['files'][0]);
@@ -85,17 +86,11 @@ class FileService
             return $e->getMessage();
         }
     }
-    static function findUser($id)
-    {
-        $user = User::find($id);
-        if (!$user) {
-            throw new Exception("User Not Found, Id: {$id}");
-        }
-        return $user;
-    }
+   
+    
     static function getPath($id)
     {
-        $authUser = static::findUser(auth()->id());
+        $authUser = UserService::findUser(auth()->id());
         if ($authUser->sentFiles->contains($id) || $authUser->receivedFiles->contains($id)) {
             $file = File::find($id);
             $file_path = public_path('storage\\' . $file->path);

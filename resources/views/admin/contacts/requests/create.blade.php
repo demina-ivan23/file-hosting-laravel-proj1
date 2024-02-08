@@ -32,8 +32,8 @@
       <div class="p-3">
   
           <div class="mb-3">
-              <label for="id" class="form-label">User's ID</label>
-              <input class="form-control" type="text" name="id" id="id" placeholder="Write the user's id here...">
+              <label for="id" class="form-label">User's PublicID</label>
+              <input class="form-control" type="text" name="publicId" id="publicId" placeholder="Write the user's id here...">
           </div>
         
           <button class="btn btn-primary float-end mb-2" type="submit">

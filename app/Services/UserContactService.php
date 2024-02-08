@@ -7,14 +7,15 @@ use App\Models\File;
 
 use App\Models\User;
 use App\Models\Message;
+use App\Services\UserService;
 use App\Models\UserContactRequest;
 
 class UserContactService
 {
     static function storeContact($request)
     {
-        $userToAdd = static::findUser($request->id);
-        $authUser = static::findUser(auth()->id());
+        $userToAdd = UserService::findUserByPublicId($request->publicId);
+        $authUser = UserService::findUser(auth()->id());
 
         if (!$authUser->contacts->contains($userToAdd)) {
 
@@ -53,11 +54,11 @@ class UserContactService
             abort(403, 'You Already Have This User As A Contact');
         }
     }
-    static function getRelatedFiles($id)
+    static function getRelatedFiles($publicId)
     {
         try {
-            $contact = static::findUser($id);
-            $authUser = static::findUser(auth()->id());
+            $contact = UserService::findUserByPublicId($publicId);
+            $authUser = UserService::findUser(auth()->id());
             if (!$contact->contacts->contains($authUser)) {
                 abort(403);
             }
@@ -81,73 +82,63 @@ class UserContactService
         }
     }
 
-    static function getReceivedFiles($id){
-        try {
-            $contact = static::findUser($id);
-            $authUser = static::findUser(auth()->id());
-            if (!$contact->contacts->contains($authUser)) {
-                abort(403);
-            }
-            $files = File::where(function ($query) use ($contact) {
-                    $query->where('sender_id', $contact->id)
-                        ->where('receiver_id', auth()->id());
-                })
-                ->filter()
-                ->latest()
-                ->paginate(10);
-            if ($files->isEmpty()) {
-                return [];
-            }
-            return $files;
-        } catch (Exception $e) {
-            return $e->getMessage();
-        }
-    }
-    static function getSentFiles($id){
-        try {
-            $contact = static::findUser($id);
-            $authUser = static::findUser(auth()->id());
-            if (!$contact->contacts->contains($authUser)) {
-                abort(403);
-            }
-            $files = File::where(function ($query) use ($contact) {
-                    $query->where('sender_id', auth()->id())
-                        ->where('receiver_id', $contact->id);
-                })
-                ->filter()
-                ->latest()
-                ->paginate(10);
-            if ($files->isEmpty()) {
-                return [];
-            }
-            return $files;
-        } catch (Exception $e) {
-            return $e->getMessage();
-        }
-    }
-
-    static function findUser($id)
-    {
-
-        $userToAdd = User::find($id);
-        if (!$userToAdd) {
-            throw new Exception("User Not Found, Id: {$id}");
-        }
-        return $userToAdd;
-    }
+    // static function getReceivedFiles($id){
+    //     try {
+    //         $contact = static::findUser($publicd);
+    //         $authUser = static::findUser(auth()->id());
+    //         if (!$contact->contacts->contains($authUser)) {
+    //             abort(403);
+    //         }
+    //         $files = File::where(function ($query) use ($contact) {
+    //                 $query->where('sender_id', $contact->id)
+    //                     ->where('receiver_id', auth()->id());
+    //             })
+    //             ->filter()
+    //             ->latest()
+    //             ->paginate(10);
+    //         if ($files->isEmpty()) {
+    //             return [];
+    //         }
+    //         return $files;
+    //     } catch (Exception $e) {
+    //         return $e->getMessage();
+    //     }
+    // }
+    // static function getSentFiles($id){
+    //     try {
+    //         $contact = static::findUser($id);
+    //         $authUser = static::findUser(auth()->id());
+    //         if (!$contact->contacts->contains($authUser)) {
+    //             abort(403);
+    //         }
+    //         $files = File::where(function ($query) use ($contact) {
+    //                 $query->where('sender_id', auth()->id())
+    //                     ->where('receiver_id', $contact->id);
+    //             })
+    //             ->filter()
+    //             ->latest()
+    //             ->paginate(10);
+    //         if ($files->isEmpty()) {
+    //             return [];
+    //         }
+    //         return $files;
+    //     } catch (Exception $e) {
+    //         return $e->getMessage();
+    //     }
+    // }
     static function getContacts()
     {
-        $authUser = User::find(auth()->id());
+        $authUser = UserService::findUser(auth()->id());
         return $authUser->contacts()->filter()->paginate(5);
     }
-    static function blockUser($request, $id)
+    static function blockUser($request, $publicId)
     {
         try {
-            $authUser = static::findUser(auth()->id());
-            $contact = static::findUser($id);
+            $authUser = UserService::findUser(auth()->id());
+            $contact = UserService::findUserByPublicId($publicId);
             if ($request['blocking']) {
-                if (!$authUser->blacklist->contains($id)) {
-                    $authUser->blacklist()->attach($id);
+                if (!$authUser->blacklist->contains($contact->id)) {
+                    $authUser->blacklist()->attach($contact->id);
                     $messageToAuth = Message::create([
                         'text' => "You Have Blocked The User Who's Email is $contact->email",
                         'system' => true,
@@ -165,8 +156,8 @@ class UserContactService
                     abort(403, 'You Have Already Blocked The User');
                 }
             } else if ($request['blocking'] == false) {
-                if ($authUser->blacklist->contains($id)) {
-                    $authUser->blacklist()->detach($id);
+                if ($authUser->blacklist->contains($contact->id)) {
+                    $authUser->blacklist()->detach($contact->id);
                     $messageToAuth = Message::create([
                         'text' => "You Have Unlocked The User Who's Email is $contact->email",
                         'system' => true,
@@ -190,26 +181,25 @@ class UserContactService
             return $e->getMessage();
         }
     }
-    static function deleteContact($id)
+    static function deleteContact($publicId)
     {
         try {
-
-            $authUser = static::findUser(auth()->id());
-            $contactUser = static::findUser($id);
-            $authUser->contacts()->detach($id);
-            $contactUser->contacts()->detach(auth()->id());
+            $authUser = UserService::findUser(auth()->id());
+            $contact = UserService::findUserByPublicId($publicId);
+            $authUser->contacts()->detach($contact->id);
+            $contact->contacts()->detach(auth()->id());
             $messageToAuth = Message::create([
-                'text' => "You Have Deleted $contactUser->email. You Are Not Contacts Anymore",
+                'text' => "You Have Deleted $contact->email. You Are Not Contacts Anymore",
                 'system' => true,
                 'userReceiver' => $authUser->id
             ]);
             $messageToContact = Message::create([
                 'text' => "You Have Been Deleted By $authUser->email. You Are Not Contacts Anymore",
                 'system' => true,
-                'userReceiver' => $contactUser->id
+                'userReceiver' => $contact->id
             ]);
             $authUser->messages()->attach($messageToAuth);
-            $contactUser->messages()->attach($messageToContact);
+            $contact->messages()->attach($messageToContact);
             return 'Contact Deleted Successfully';
         } catch (Exception $e) {
             return $e->getMessage();
