@@ -29,3 +29,8 @@ Route::prefix('/files')->middleware('auth')->name('admin.files.')->group(base_pa
 Route::prefix('/messages')->middleware('auth')->name('admin.messages.')->group(base_path('routes/web/messages.php'));
 
 Route::prefix('/global-files')->name('admin.global-files.')->group(base_path('routes/web/global-files.php'));
+
+
+
+
+Route::prefix('/user')->middleware('auth')->name('user.')->group(base_path('routes/web/user.php'));

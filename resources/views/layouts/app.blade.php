@@ -16,7 +16,7 @@
     <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
     <!-- Scripts -->
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
-
+    @yield('styles')
 </head>
 <body>
     <div id="app">
@@ -58,6 +58,12 @@
                                 </a>
 
                                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                    <a class="dropdown-item" href="{{ route('user.home') }}">
+                                        Home
+                                     </a>
+                                     <a class="dropdown-item" href="{{ route('user.profile', ['user' => auth()->user()->publicId]) }}">
+                                        Profile
+                                     </a>
                                     <a class="dropdown-item" href="{{ route('logout') }}"
                                        onclick="event.preventDefault();
                                                      document.getElementById('logout-form').submit();">
@@ -68,9 +74,6 @@
                                         @csrf
                                     </form>
 
-                                    <a class="dropdown-item" href="{{ route('home') }}">
-                                        Home
-                                     </a>
                                 </div>
 
                                 
