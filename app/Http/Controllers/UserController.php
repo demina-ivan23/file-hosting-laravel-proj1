@@ -43,23 +43,29 @@ class UserController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(string $publicId)
     {
-        //
+        $user = UserService::findUserByPublicId($publicId);
+        return view('user.edit', ['user' => $user]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, string $publicId)
     {
-        //
+        $result = UserService::updateUser($request, $publicId);
+        if(str_contains($result, 'Successfully')){
+            return redirect()->route('user.profile' , ['user' => $publicId])->with('success', $result);
+        } else {
+            return redirect()->route('user.edit', ['user' => $publicId])->with('error', $result);
+        }
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $publicId)
     {
         //
     }
