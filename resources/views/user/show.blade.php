@@ -58,9 +58,12 @@
                 
             </div>
             <div>
-                <form action="#">
-                    @csrf
-                    <button type="submit" onclick="return confirm('Do You Really Want To Reset Your Id? It\'s A Very Peculiar Process (it\'ll take a while)')">
+                <form action="{{route('user.reset_public_id', ['user' => $user->publicId])}}" method="POST">
+                    @csrf 
+                    @method('PUT')
+                    <input type="text" name="name" value="{{$user->name}}" hidden>
+                    <input type="text" name="email" value="{{$user->email}}" hidden>
+                    <button type="submit" onclick="return confirm('Do You Really Want To Reset Your Public Id?')">
                         <img src="{{asset('storage/icons/circle-of-two-clockwise-arrows-rotation.png')}}" alt="" width="30">
                     </button>
                 </form>
@@ -107,7 +110,7 @@
 </div>
 
 @endsection
-@section('styles')
+{{-- @section('styles')
     <link href="{{ asset('css/styles.css') }}" rel="stylesheet">
-@endsection
+@endsection --}}
 

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Message;
 use Exception;
 use App\Models\User;
 
@@ -84,5 +85,20 @@ class UserService
         if($path){
             Storage::disk($disk)->delete($path);
         } 
+    }
+    static function resetPublicId($publicId)
+    {
+        $user = static::findUserByPublicId($publicId);
+        $newPublicId = Str::uuid();
+        $user->update([
+            'publicId' => $newPublicId
+        ]);
+        $message_to_user = Message::create([
+            'text' => "You Have Reset Your Public ID To $newPublicId",
+            'system' => true,
+            'userReceiver' => $user->id
+        ]);
+        $user->messages()->attach($message_to_user);
+       return $newPublicId;
     }
 }

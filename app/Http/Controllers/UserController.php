@@ -55,11 +55,23 @@ class UserController extends Controller
      */
     public function update(UserRequest $request, string $publicId)
     {
-        $result = UserService::updateUser($request, $publicId);
+        $user = UserService::findUserByPublicId($publicId);
+        $result = 'Unidentified Route';
+        $currentRoute = request()->route()->getName();
+        if($currentRoute === 'user.update')
+        {
+            $result = UserService::updateUser($request, $publicId);
+        }
+        if($currentRoute === 'user.reset_public_id')
+        {
+            $newpublicId = UserService::resetPublicId($publicId);
+            $user = UserService::findUserByPublicId($newpublicId);
+            $result = 'Public Id Reset Successfully';
+        }
         if(str_contains($result, 'Successfully')){
-            return redirect()->route('user.profile' , ['user' => $publicId])->with('success', $result);
+            return redirect()->route('user.profile' , ['user' => $user->publicId])->with('success', $result);
         } else {
-            return redirect()->route('user.edit', ['user' => $publicId])->with('error', $result);
+            return redirect()->route('user.profile' , ['user' => $user->publicId])->with('error', $result);
         }
     }
 
