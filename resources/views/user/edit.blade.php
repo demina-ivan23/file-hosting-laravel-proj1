@@ -18,7 +18,7 @@
                 <div class="card-header">Edit Your Profile</div>
 
                 <div class="card-body">
-                    <form method="POST" action="{{route('user.update', ['user'=>$user->publicId])}}">
+                    <form method="POST" action="{{route('user.update', ['user'=>$user->publicId])}}" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
 
@@ -74,6 +74,19 @@
                         <div class="row mb-3">
                             <div class="" style="font-size: 0.9em">
                                 (If You leave the password fields empty, the password won't be changed)
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <label for="profileImage" class="col-md-4 col-form-label text-md-end">Profile Image</label>
+
+                            <div class="col-md-6">
+                                <input id="profileImage" type="file" class="form-control @error('profileImage') is-invalid @enderror" name="profileImage">
+
+                                @error('profileImage')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
                             </div>
                         </div>
 

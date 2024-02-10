@@ -1,13 +1,16 @@
-<?php 
+<?php
 
 namespace App\Services;
 
 use Exception;
 use App\Models\User;
 
-use function PHPUnit\Framework\isEmpty;
+use Illuminate\Support\Str;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 
-class UserService{
+class UserService
+{
     static function findUser($id)
     {
         $user = User::find($id);
@@ -27,35 +30,59 @@ class UserService{
     }
     static function updateUser($request, $publicId)
     {
-        $user = static::findUserByPublicId($publicId);
-        if($user->id !== auth()->id())
-        {
-            return 'This Is NOT Your Profile. So Be Kind And Don\'t Try To Be A Wiseass.';
-        }
-        $name = $request['name'];
-        $email = $request['email'];
-        if($request['password'] != '' || $request['password_confirmation'] != '')
-        {
-            $password = $request['password'];
-            $password_confirm = $request['password_confirmation'];
-            if($password === $password_confirm)
+        try {
+
+            $user = static::findUserByPublicId($publicId);
+            if ($user->id !== auth()->id()) {
+                return 'This Is NOT Your Profile. So Be Kind And Don\'t Try To Be A Wiseass.';
+            }
+            $profileImage = $user->profileImage; // Retain existing profile image path by default
+
+            if ($request->hasFile('profileImage')) // Check if a new profile image is uploaded
             {
-                $newPassword = bcrypt($password);
+                static::deletePreviousProfileImage($profileImage);
+                $profileImage = static::uploadProfileImage($request->file('profileImage'));
+                // dd($profileImage); 
             }
-            else{
-                return 'Password And Password Confirm Do Not Match';
+            $name = $request['name'];
+            $email = $request['email'];
+            if ($request['password'] != '' || $request['password_confirmation'] != '') {
+                $password = $request['password'];
+                $password_confirm = $request['password_confirmation'];
+                if ($password === $password_confirm) {
+                    $newPassword = bcrypt($password);
+                } else {
+                    return 'Password And Password Confirm Do Not Match';
+                }
+            } else {
+                $newPassword = $user->password;
             }
-        }
-        else{
-            $newPassword = $user->password;
-        }
-        $user->update([
-            'name' => $name,
-            'email' => $email,
-            'password' => $newPassword
-        ]);
+            $user->update([
+                'name' => $name,
+                'email' => $email,
+                'password' => $newPassword,
+                'profileImage' => $profileImage
+            ]);
+            // dd($user->profileImage, $profileImage); 
 
-        return 'User Updated Successfully';
-
+            return 'Profile Updated Successfully';
+        } catch (Exception $e) {
+            return $e->getMessage();
+        }
+    }
+    static function uploadProfileImage(UploadedFile $profileImage, $disk = 'public', $filename = null)
+    {
+        $FileName = !is_null($filename) ? $filename : Str::random(10);
+        return $profileImage->storeAs(
+            'users/profiles/images',
+            $FileName . "." . $profileImage->getClientOriginalExtension(),
+            $disk
+        );
+    }
+    static function deletePreviousProfileImage(?string $path,  $disk = 'public')
+    {
+        if($path){
+            Storage::disk($disk)->delete($path);
+        } 
     }
 }

@@ -35,7 +35,7 @@
         </div>
     <div class="d-flex justify-content-center align-items-center mt-5">
         @if ($user->profileImage)
-        <img src="{{$user->profileImage}}" alt="user image placeholder" width="100" height="100">
+        <img src="{{asset('storage/'.$user->profileImage)}}" alt="user image" width="100" height="100">
             @else
         <img src="/users/profiles/images/user.png" alt="user image placeholder" width="100" height="100">
         @endif

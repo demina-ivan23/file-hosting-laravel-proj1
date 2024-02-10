@@ -3,10 +3,14 @@
 
             <div class="row">
 
-                    <div class="col-sm-3 d-flex align-items-center justify-content-center">
-<img src="/users/profiles/images/user.png" width="105" height="105"  alt="">  
-                    </div>
 @if($request->receiver->id === auth()->id())
+                <div class="col-sm-3 d-flex align-items-center justify-content-center">
+                    @if ($request->sender->profileImage)
+                    <img src="{{asset('storage/'.$request->sender->profileImage)}}" alt="user image" width="100" height="100">
+                        @else
+                    <img src="/users/profiles/images/user.png" alt="user image placeholder" width="100" height="100">
+                    @endif
+                </div>
     
 <div class="col-sm-5">
 
@@ -36,6 +40,13 @@
 </div>
 @endif
 @if($request->sender->id === auth()->id())
+<div class="col-sm-3 d-flex align-items-center justify-content-center">
+    @if ($request->receiver->profileImage)
+    <img src="{{asset('storage/'.$request->receiver->profileImage)}}" alt="user image" width="100" height="100">
+        @else
+    <img src="/users/profiles/images/user.png" alt="user image placeholder" width="100" height="100">
+    @endif
+</div>
 <div class="col-sm-6">
 
     {{-- Enshure that request sender doesn't

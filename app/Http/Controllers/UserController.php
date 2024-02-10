@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\UserService;
 use Illuminate\Http\Request;
+use App\Services\UserService;
+use App\Http\Requests\UserRequest;
 
 class UserController extends Controller
 {
@@ -52,7 +53,7 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $publicId)
+    public function update(UserRequest $request, string $publicId)
     {
         $result = UserService::updateUser($request, $publicId);
         if(str_contains($result, 'Successfully')){
