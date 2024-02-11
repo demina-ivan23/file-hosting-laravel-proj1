@@ -1,0 +1,32 @@
+.header {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-template-rows: repeat(15, 50px);
+}
+.header__slideshow {
+  grid-column-start: 1;
+  grid-column-end: 13;
+  grid-row-start: 1;
+  grid-row-end: 6;
+  display: flex;
+  background-color: aqua;
+  justify-content: center;
+  align-items: center;
+}
+.header__stats {
+  margin-top: 10px;
+  grid-column-start: 1;
+  grid-column-end: 5;
+  grid-row-start: 6;
+  grid-row-end: 12;
+  background-color: beige;
+}
+.header__text {
+  margin-top: 10px;
+  margin-left: 6px;
+  grid-column-start: 5;
+  grid-column-end: 13;
+  grid-row-start: 6;
+  grid-row-end: 12;
+  background-color: red;
+}/*# sourceMappingURL=home.css.map */
