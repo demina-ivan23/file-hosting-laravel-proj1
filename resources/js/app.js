@@ -6,7 +6,9 @@
 
 import './bootstrap';
 import { createApp } from 'vue';
-
+import { bytesToBase64 } from './base64';
+import { compressByImgCur } from './compress-decompress';
+import * as hash from 'hash.js';
 /**
  * Next, we will create a fresh Vue application instance. You may then begin
  * registering components with the application instance so they are ready
@@ -72,46 +74,20 @@ const app = createApp({
                 }
             }
         },
-        async saveCanvasCookie()
+         async saveCanvasCookie()
         {
             const ctx = document.getElementById('canvas').getContext('2d');
-            ctx.font = '48px serif';
-            ctx.fillText('Hello World', 10, 50); 
-            const imageData = ctx.getImageData(0,0,200,100).data;
-            // const cookieExists = await this.checkIfCookieExists(imageData);
-            // if (!cookieExists) {
-            //     this.saveCookieToDatabase(imageData);
-            // }
-        },
-        // async checkIfCookieExists(imageData) {
-        //     try {
-        //         const response = await axios.get('/api/check-cookie', {
-        //             params: { imageData: JSON.stringify(imageData) }
-        //         });
-        //         return response.data.exists; // Assuming your API returns a boolean 'exists' field
-        //     } catch (error) {
-        //         console.error('Error checking if cookie exists:', error);
-        //         return false; // Assume cookie doesn't exist in case of an error
-        //     }
-        // },
-        // async saveCookieToDatabase(imageData) {
-        //     try {
-        //         const response = await axios.post('/api/save-cookie', {
-        //             imageData: JSON.stringify(imageData)
-        //         });
-    
-        //         console.log('Cookie saving result:', response.data);
-        //     } catch (error) {
-        //         console.error('Error saving cookie:', error);
-        //     }
-        // },
-
+            ctx.font = '12px serif';
+            ctx.fillText('Hail World', 10, 10); 
+            const imageData = ctx.getImageData(0,0,70,30).data;
+             const hashedImageData = hash.sha256().update(bytesToBase64(imageData)).digest('hex');
+            document.cookie = "canvasId="+hashedImageData;
+        }
     },
     mounted() {
         this.saveCanvasCookie();
     }
 });
-
 
 
 import ExampleComponent from './components/ExampleComponent.vue';

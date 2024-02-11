@@ -13,7 +13,13 @@ return new class extends Migration
     {
         Schema::create('cookies', function (Blueprint $table) {
             $table->id();
-            $table->json('image_data');
+            $table->string('canvasId');
+            $table->unsignedBigInteger('userId')->nullable();
+            $table->index('userId');
+            $table->foreign('userId')
+            ->references('id')
+            ->on('users')
+            ->onDelete('SET NULL');
             $table->timestamps();
         });
     }
