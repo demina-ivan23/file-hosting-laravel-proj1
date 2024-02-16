@@ -7,7 +7,6 @@
 import './bootstrap';
 import { createApp } from 'vue';
 import { bytesToBase64 } from './base64';
-import { compressByImgCur } from './compress-decompress';
 import * as hash from 'hash.js';
 /**
  * Next, we will create a fresh Vue application instance. You may then begin
@@ -74,14 +73,43 @@ const app = createApp({
                 }
             }
         },
-         async saveCanvasCookie()
-        {
+         getCookie(cookieName) {
+            let cookie = {};
+            document.cookie.split(';').forEach(function(el) {
+              let [key,value] = el.split('=');
+              cookie[key.trim()] = value;
+            });
+            return cookie[cookieName];
+          },
+         async saveCanvasCookie() {
             const ctx = document.getElementById('canvas').getContext('2d');
             ctx.font = '12px serif';
-            ctx.fillText('Hail World', 10, 10); 
-            const imageData = ctx.getImageData(0,0,70,30).data;
-             const hashedImageData = hash.sha256().update(bytesToBase64(imageData)).digest('hex');
-            document.cookie = "canvasId="+hashedImageData;
+            ctx.fillText('Hail World', 10, 10);
+            const imageData = ctx.getImageData(0, 0, 70, 30).data;
+            const hashedImageData = hash.sha256().update(imageData).digest('hex');
+        
+            // Check if the cookie already exists
+            try {
+            if (!document.cookie.includes('canvasId')) {
+                    const response = await axios.post('/api/save-canvas-cookie', {
+                        canvasCookie: {
+                            canvasId: hashedImageData,
+                        },
+                    });
+                    console.log('Cookie saving result:', response.data);
+                }
+                else {
+                    let cookieVal = '';
+                        const response = await axios.post('/api/update-canvas-cookie', {
+                            canvasCookie: {
+                                canvasId: cookieVal
+                            },
+                        });
+                        console.log('Cookie updating result:', response.data);
+                }
+            } catch (error) {
+                console.error('Error saving cookie:', error);
+            }
         }
     },
     mounted() {

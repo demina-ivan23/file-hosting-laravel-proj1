@@ -18,7 +18,7 @@ return new class extends Migration
             $table->index('viewer_id');
             $table->foreign('viewer_id')
             ->references('id')
-            ->on('users')
+            ->on('canvas_cookies')
             ->onDelete('CASCADE');
 
             $table->unsignedBigInteger('global_file');

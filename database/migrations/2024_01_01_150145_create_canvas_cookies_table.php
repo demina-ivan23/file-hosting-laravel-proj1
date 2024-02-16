@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('cookies', function (Blueprint $table) {
+        Schema::create('canvas_cookies', function (Blueprint $table) {
             $table->id();
             $table->string('canvasId');
             $table->unsignedBigInteger('userId')->nullable();

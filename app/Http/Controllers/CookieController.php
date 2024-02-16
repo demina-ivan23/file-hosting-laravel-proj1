@@ -29,12 +29,12 @@ class CookieController extends Controller
      */
     public function store(Request $request)
     {
-        $this->validate($request, [
-            'imageData' => 'required|string',
-        ]);
-        $binaryData = base64_decode($request->input('imageData')['base64']);
-        $result = CookieService::createCookie(json_encode($binaryData));
-        return response()->json(['message' => $result]);
+        $currentRoute = request()->route()->getName();
+        if($currentRoute == "save-canvas-cookie")
+        {    
+            $responce = CookieService::createCookie('canvasId', $request['canvasCookie']['canvasId']);
+        }
+       return $responce;
     }
 
     /**
@@ -42,12 +42,7 @@ class CookieController extends Controller
      */
     public function show(Request $request)
     {
-        $this->validate($request, [
-            'imageData' => 'required|string',
-        ]);
-        $binaryData = base64_decode($request->input('imageData')['base64']);
-        $exists = CookieService::checkIfCookieExists(json_encode($binaryData));
-        return response()->json(['exists' => $exists]);
+      //
     }
 
     /**
@@ -61,9 +56,14 @@ class CookieController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request)
     {
-        //
+        $currentRoute = request()->route()->getName();
+        if($currentRoute === 'update-canvas-cookie')
+        {
+            $responce = CookieService::updateCookie('canvasId', request()->cookie('canvasId'));
+        }
+        return $responce;
     }
 
     /**

@@ -82,18 +82,12 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(GlobalFile::class, 'global_file_owner', 'owner_id', 'global_file');
     }
-    public function viewedGlobalFiles()
-    {
-        return $this->belongsToMany(GlobalFile::class, 'global_file_views', 'viewer_id', 'global_file');
-    }
+ 
     public function likedGlobalFiles()
     {
         return $this->belongsToMany(GlobalFile::class, 'global_file_likes', 'user_id', 'global_file');
     }
-    public function downloadedGlobalFiles()
-    {
-        return $this->belongsToMany(GlobalFile::class, 'global_file_downloads', 'user_id', 'global_file');
-    }
+   
     public function likedComments()
     {
         return $this->belongsToMany(Comment::class, 'comment_likes', 'user_id', 'comment_id');

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\CanvasCookie;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -20,6 +21,14 @@ class GlobalFile extends Model
     public function comments(): BelongsToMany
     {
         return $this->belongsToMany(Comment::class);
+    }
+    public function viewedBy(): BelongsToMany
+    {
+        return $this->belongsToMany(CanvasCookie::class, 'global_file_views', 'global_file', 'viewer_id');
+    }
+    public function downloadedBy(): BelongsToMany
+    {
+        return $this->belongsToMany(CanvasCookie::class, 'global_file_downloads', 'global_file', 'downloader_id');
     }
     public function scopeFilter($query)
     {

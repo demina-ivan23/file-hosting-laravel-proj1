@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Models\Message;
 use App\Models\GlobalFile;
 use Illuminate\Support\Str;
+use App\Models\CanvasCookie;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use App\Services\ArchiveMakers\TarArchiveMaker;
@@ -181,30 +182,28 @@ class GlobalFileService
     }
     static function incrementViews($file)
     {
-        if (auth()->id()) {
-
-            $authUser = static::findUser(auth()->id());
-            if (!$authUser->viewedGlobalFiles->contains($file->id)) {
+        $getCookieVal = request()->cookie('canvasId');
+        $cookie = CanvasCookie::where('canvasId', $getCookieVal)->first();
+            if (!$file->viewedBy->contains($cookie->id)) {
                 $views = $file->views + 1;
                 $file->update(['views' => $views]);
-                $authUser->viewedGlobalFiles()->attach($file->id);
+                $file->viewedBy()->attach($cookie->id);
             } else {
                 //   
             }
-        }
     }
     static function incrementDownloads($file)
     {
-        if (auth()->id()) {
-            $authUser = static::findUser(auth()->id());
-            if (!$authUser->downloadedGlobalFiles->contains($file->id)) {
+        $getCookieVal = request()->cookie('canvasId');
+        $cookie = CanvasCookie::where('canvasId', $getCookieVal)->first();
+            if (!$file->downloadedBy->contains($cookie->id)) {
                 $downloads = $file->downloads + 1;
                 $file->update(['downloads' => $downloads]);
-                $authUser->downloadedGlobalFiles()->attach($file->id);
+                $file->downloadedBy()->attach($cookie->id);
             } else {
                 //   
             }
-        }
+    
     }
     static function incrementLikes($file)
     {

@@ -15,11 +15,11 @@ return new class extends Migration
             $table->id();
 
             
-            $table->unsignedBigInteger('user_id');
-            $table->index('user_id');
-            $table->foreign('user_id')
+            $table->unsignedBigInteger('downloader_id');
+            $table->index('downloader_id');
+            $table->foreign('downloader_id')
             ->references('id')
-            ->on('users')
+            ->on('canvas_cookies')
             ->onDelete('CASCADE');
 
             $table->unsignedBigInteger('global_file');
