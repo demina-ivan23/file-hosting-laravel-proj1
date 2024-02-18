@@ -32,4 +32,4 @@ Route::prefix('/global-files')->name('admin.global-files.')->group(base_path('ro
 
 
 
-Route::prefix('/user')->middleware('auth')->name('user.')->group(base_path('routes/web/user.php'));
+Route::prefix('/user')->name('user.')->group(base_path('routes/web/user.php'));

@@ -6,25 +6,22 @@
 <div class="card mt-3">
     <div class="card-body">
         <div class="header">
-            <div class="header__slideshow">
-                <h1>This Is A Home Page</h1>
+            <div class="header__headline">
+                Headline Of This Website 
             </div>
-            <div class="header__stats">
-                <ul>
-                    <li>
-                        <h5>{{auth()->user()->name}}</h5>
-                    </li>
-                    <li>
-                        <h5>{{auth()->user()->email}}</h5>
-                    </li>
-                    <li>
-                        <h5>This Is A Stat Element</h5>
-                    </li>
-                    
-                </ul>
+            <div class="header__subheadline">
+                Subheadline of the website
             </div>
-            <div class="header__text">
-                
+            <div class="header__authentication">
+                <div class="action">
+                    <a class="action__register-btn" href="{{route('register')}}">Get Started</a>
+                </div>
+                <div class="header__authentication__text">
+                    Or, if You already have an account
+                </div>
+                <div class="action">
+                    <a class="action__login-btn" href="{{route('login')}}">Log In</a>
+                </div>
             </div>
         </div>
     </div>
