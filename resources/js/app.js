@@ -8,6 +8,7 @@ import './bootstrap';
 import { createApp } from 'vue';
 import { bytesToBase64 } from './base64';
 import * as hash from 'hash.js';
+import * as plupload from './plupload-2.3.9/js/plupload.full.min.js';
 /**
  * Next, we will create a fresh Vue application instance. You may then begin
  * registering components with the application instance so they are ready
@@ -110,10 +111,31 @@ const app = createApp({
             } catch (error) {
                 console.error('Error saving cookie:', error);
             }
-        }
+        },
+        uploadFiles()
+        {
+            if(!document.querySelector('#browse') )
+            {
+                return;
+            }
+            var uploader = new plupload.Uploader({
+                browse_button: 'browse', // this can be an id of a DOM element or the DOM element itself
+                url: 'upload.php'
+              });
+              uploader.init();
+              uploader.bind('FilesAdded', function(up, files) {
+                var html = '';
+                plupload.each(files, function(file) {
+                  html += '<li id="' + file.id + '">' + file.name + ' (' + plupload.formatSize(file.size) + ') <b></b></li>';
+                });
+                document.getElementById('filelist').innerHTML += html;
+              });
+               
+        },
     },
     mounted() {
         this.saveCanvasCookie();
+        this.uploadFiles();
     }
 });
 

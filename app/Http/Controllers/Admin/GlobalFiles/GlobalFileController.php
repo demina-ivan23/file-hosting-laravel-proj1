@@ -29,12 +29,8 @@ class GlobalFileController extends Controller
      */
     public function create(Request $request)
     {
-        $currentRoute = $request->route()->getName();
-        if ($currentRoute === 'admin.global-files.public.create') {
-            return view('admin.global-files.public.create');
-        } else if ($currentRoute === 'admin.global-files.protected.create') {
-            return view('admin.global-files.protected.create');
-        }
+        return view('admin.files.create');
+        
     }
 
     /**

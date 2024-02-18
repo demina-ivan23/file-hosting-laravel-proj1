@@ -27,7 +27,7 @@ class PersonalFilesController extends Controller
      */
     public function create()
     {
-        return view('admin.files.personal.create');
+        return view('admin.files.create');
     }
 
     /**

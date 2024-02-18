@@ -35,10 +35,10 @@ class MultipleFilesController extends Controller
       $result = MultipleFilesService::sendFiles($request, $user);
       if(str_contains($result, 'Successfully'))
       {
-        return redirect()->route('admin.contacts.show', ['user' => $user])->with('success', $result);
+        return redirect()->route('admin.contacts.show', ['user' => $user->publicId])->with('success', $result);
       }
       else{
-        return redirect()->route('admin.contacts.show', ['user' => $user])->with('error', $result);
+        return redirect()->route('admin.contacts.show', ['user' => $user->publicId])->with('error', $result);
       }
     }
 

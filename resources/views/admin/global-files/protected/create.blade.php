@@ -64,7 +64,6 @@
         <select class="form-control" name="fileCompressionFormat" id="fileCompressionFormat">
             <option value="zip">zip</option>
             <option value="tar">tar (.tar)</option>
-            <option value="none">none</option>
 
         </select>
     </div>
