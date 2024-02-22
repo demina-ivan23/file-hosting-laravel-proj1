@@ -15,7 +15,10 @@
     <!-- Tailwind -->
     <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
     <!-- Scripts -->
+    <script src="http://127.0.0.1:5173/resources/js/plupload-2.3.9/js/plupload.full.min.js"></script>
+
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
+
     @yield('styles')
 </head>
 <body>

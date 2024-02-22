@@ -8,7 +8,6 @@ import './bootstrap';
 import { createApp } from 'vue';
 import { bytesToBase64 } from './base64';
 import * as hash from 'hash.js';
-import * as plupload from './plupload-2.3.9/js/plupload.full.min.js';
 /**
  * Next, we will create a fresh Vue application instance. You may then begin
  * registering components with the application instance so they are ready
@@ -19,25 +18,53 @@ const app = createApp({
     data() {
         return {
             showFileFormatDropdown: false,
+            normalUploadMode: true,
+            bigFilesUploadMode: false,
+            fileUploader: null, 
         };
     },
     methods: {
         toggleFileFormatDropdown(event) {
             this.showFileFormatDropdown = event.target.files.length > 1;
         },
-        handleFormSubmit(event) {
-            event.preventDefault();
-
+        handleFileUploadModeChange(event){
+            let mode = event.target.value;
+            if(mode === "normal")
+            {
+                this.setNormalUploadMode();
+            }
+            if(mode === "bigSize")
+            {
+                this.setBigFilesUploadMode();
+            }
+        },
+        setNormalUploadMode()
+        {
+            document.getElementById('normalUploadMode').removeAttribute('hidden');
+            document.getElementById('bigFilesUploadMode').setAttribute('hidden', '');
+            this.normalUploadMode = true;
+            this.bigFilesUploadMode = false;
+        },
+        setBigFilesUploadMode()
+        {
+          document.getElementById('bigFilesUploadMode').removeAttribute('hidden'); 
+          document.getElementById('normalUploadMode').setAttribute('hidden', ''); 
+          this.normalUploadMode = false;
+          this.bigFilesUploadMode = true;    
+    },
+        async handleFormSubmit(event) {
             const form = document.getElementById('file-sending-form');
-            if (form !== undefined && form !== null) {
-                const formerAction = form.action;
-                const contactUserIdElement = document.getElementById('contact_user_id');
-        const contact_user_id = contactUserIdElement ? contactUserIdElement.value : null;
-                if(formerAction.includes("http://localhost:8000/files/send/"))
-                {
-                    const filesInput = document.querySelector('#files');
-                    
-                    if (filesInput.files.length == 1) {
+            event.preventDefault();
+            if(this.normalUploadMode){
+                if (form !== undefined && form !== null) {
+                    const formAction = form.action;
+                    const contactUserIdElement = document.getElementById('contact_user_id');
+                    const contact_user_id = contactUserIdElement ? contactUserIdElement.value : null;
+                    if(formAction.includes("http://localhost:8000/files/send/"))
+                    {
+                        const filesInput = document.querySelector('#files');
+                        
+                        if (filesInput.files.length == 1) {
                         form.action = "http://localhost:8000/files/send/" + contact_user_id;
                         form.submit();
                         
@@ -53,12 +80,11 @@ const app = createApp({
                             }
                         } else {
                             form.action = "http://localhost:8000/files/multiple/send/" + contact_user_id;
-                            
                             form.submit();
                         }
                     }
                 }
-                else if(formerAction == "http://localhost:8000/files/personal/store" || formerAction == "http://localhost:8000/global-files/store")
+                else if(formAction == "http://localhost:8000/files/personal/store" || formAction == "http://localhost:8000/global-files/store")
                 {
                     // console.log(fileAccessibility.value);
                     const fileAccessibility = document.querySelector('#fileAccessibility').value;
@@ -73,6 +99,14 @@ const app = createApp({
                     }
                 }
             }
+        }
+        else if(this.bigFilesUploadMode){
+            try {
+                this.fileUploader.start();
+            } catch (error) {
+                console.error('Error using uploader:', error);
+            }
+        }
         },
          getCookie(cookieName) {
             let cookie = {};
@@ -97,7 +131,7 @@ const app = createApp({
                             canvasId: hashedImageData,
                         },
                     });
-                    console.log('Cookie saving result:', response.data);
+                    // console.log('Cookie saving result:', response.data);
                 }
                 else {
                     let cookieVal = '';
@@ -106,31 +140,87 @@ const app = createApp({
                                 canvasId: cookieVal
                             },
                         });
-                        console.log('Cookie updating result:', response.data);
+                        // console.log('Cookie updating result:', response.data);
                 }
             } catch (error) {
                 console.error('Error saving cookie:', error);
             }
         },
-        uploadFiles()
+        async uploadFiles() 
         {
+            const currentUrl = window.location.href;
+            const contactId = document.querySelector('#contact_user_publicId') ? document.querySelector('#contact_user_publicId').value : null;
+            console.log(contactId);
             if(!document.querySelector('#browse') )
             {
                 return;
             }
-            var uploader = new plupload.Uploader({
-                browse_button: 'browse', // this can be an id of a DOM element or the DOM element itself
-                url: 'upload.php'
-              });
+            let uploader;
+            try {
+                if(currentUrl === 'http://localhost:8000/files/create/' + contactId){
+                uploader = new plupload.Uploader({
+                        browse_button: 'browse', 
+                        runtimes: 'html5,flash,silverlight,html4',
+                        url: `/files/send/${contactId}`,
+                        headers: {
+                            'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                            'Content-Type': 'multipart/form-data'
+                        },
+                        multipart: true,
+                        multipart_params: {
+                            'title' : document.getElementById('title').value,
+                            'description': document.getElementById('description').value,
+                            'category': document.getElementById('category').value
+                        },
+        
+                        file_data_name: 'file',
+                       
+                    });
+                }
+            } catch (error) {
+                console.error('Error initializing uploader:', error);
+            }
+            if(currentUrl === 'http://localhost:8000/global-files/protected/create'){
+            uploader = new plupload.Uploader({
+                    browse_button: 'browse', 
+                    url: '/global-files/store'
+                });
+            }
+            if(currentUrl === 'http://localhost:8000/global-files/public/create'){
+            uploader = new plupload.Uploader({
+                    browse_button: 'browse', 
+                    url: '/global-files/store' 
+                });
+            }
+            if(currentUrl === 'http://localhost:8000/files/personal/create'){
+            uploader = new plupload.Uploader({
+                        browse_button: 'browse', 
+                        url: '/files/personal/store' 
+                    });
+                }
+            
               uploader.init();
               uploader.bind('FilesAdded', function(up, files) {
-                var html = '';
+                let html = '';
                 plupload.each(files, function(file) {
-                  html += '<li id="' + file.id + '">' + file.name + ' (' + plupload.formatSize(file.size) + ') <b></b></li>';
+                  html += '<li id="' + file.id + '" name="file">' + file.name + ' (' + plupload.formatSize(file.size) + ') <b></b></li>';
+                  console.log(file);
                 });
                 document.getElementById('filelist').innerHTML += html;
               });
-               
+              uploader.bind('Error', function(up, err) {
+                document.getElementById('console').innerHTML += "\nError #" + err.code + ": " + err.message;
+              });
+              uploader.bind('FilesUploaded', function (up, files) {
+                // All files have been successfully uploaded
+                // You can now submit the form
+                console.log(files);
+                form.submit();
+            });
+              uploader.bind('UploadProgress', function(up, file) {
+                document.getElementById(file.id).getElementsByTagName('b')[0].innerHTML = '<span>' + file.percent + "%</span>";
+              });
+              this.fileUploader = uploader;
         },
     },
     mounted() {

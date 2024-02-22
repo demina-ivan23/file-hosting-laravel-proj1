@@ -4,7 +4,6 @@ namespace App\Services;
 
 use Exception;
 use App\Models\File;
-use App\Models\User;
 use App\Models\Message;
 use App\Models\GlobalFile;
 use App\Services\UserService;
@@ -27,26 +26,7 @@ class FileService
             ->paginate(5);
         return $files;
     }
-    // static function getSentFiles()
-    // {
-    //     $files = File::where(function ($query) {
-    //         $query->where('sender_id', auth()->id());
-    //     })
-    //         ->filter()
-    //         ->latest()
-    //         ->paginate(10);
-    //     return $files;
-    // }
-    // static function getReceivedFiles()
-    // {
-    //     $files = File::where(function ($query) {
-    //         $query->where('receiver_id', auth()->id());
-    //     })
-    //         ->filter()
-    //         ->latest()
-    //         ->paginate(10);
-    //     return $files;
-    // }
+  
 
     static function createFiles($publicId)
     {
@@ -62,7 +42,6 @@ class FileService
     static function sendFile($request, $id)
     {
         try {
-
             $authUser = UserService::findUser(auth()->id());
             $data = $request->all();
             $userReciever = UserService::findUser($id);
@@ -82,6 +61,27 @@ class FileService
                 //Notice: make messages for each sent/received file here
                 return 'File Uploaded Successfully';
             }
+        } catch (Exception $e) {
+            return $e->getMessage();
+        }
+    }
+    static function sendFileViaPlupload($request, $id)
+    {
+        try{
+            $authUser = UserService::findUser(auth()->id());
+            $userReciever = UserService::findUserByPublicId($id);
+                $path = $request['title'];
+                $file = File::create([
+                    'path' => $path,
+                    // 'title' => $data['title'],
+                    // 'description' => $data['description'],
+                    // 'category' => $data['category'],
+                    'state' => 'active',
+                    'sender_id' => $authUser->id,
+                    'receiver_id' => $userReciever->id
+                ]);
+                $authUser->sentFiles()->attach($file, ['userReceiver' => $userReciever->id]);
+                return 'File Uploaded Successfully';
         } catch (Exception $e) {
             return $e->getMessage();
         }

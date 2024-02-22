@@ -105,7 +105,7 @@
             @endif
                 @csrf
                 @if(request()->route()->getName() === 'admin.files.create')
-                <input type="hidden" value="{{$contact_user->id}}" id="contact_user_id"> 
+                <input type="hidden" value="{{$contact_user->publicId}}" id="contact_user_publicId"> 
                 @endif
                 
 <div class="p-3">
@@ -125,21 +125,38 @@
         <input class="form-control" type="text" name="category" id="category" placeholder="Category...">
     </div>
     <div class="mb-3">
-        <label for="file" class="form-label">Select Files</label>
-        <!-- <input class="form-control" type="file" name="files[]" id="files" multiple @change="toggleFileFormatDropdown"> -->
-        <ul id="filelist"></ul>
-        <br />
-        <a id="browse" href="javascript:;">[Browse...]</a> 
-    </div>
-    <div class="mb-3" v-if="showFileFormatDropdown">
-        <label for="fileFormat" class="form-label">Select File Format</label>
-        <select class="form-control" name="fileCompressionFormat" id="fileCompressionFormat">
-            @if(request()->route()->getName() === 'admin.files.create' || request()->route()->getName() === 'admin.files.personal.create')
-            <option value="none">none</option>
-            <option value="zip">zip</option>
-            <option value="tar">tar (.tar)</option>
-            @endif
+        <label for="fileUoladType">Select The File Upload Type</label>
+        <select class="form-control" name="fileUploadType" id="fileUploadType" @change="handleFileUploadModeChange">
+            <option value="normal">For small and medium size files</option>
+            <option value="bigSize">For big files (archivation is unavailable)</option>
         </select>
+    </div>
+    <div id="bigFilesUploadMode" hidden>
+        <div class="mb-3">
+            <label for="filelist" class="form-label">Select Files</label>
+            <ul id="filelist"></ul>
+            <br />
+            <pre id="console"></pre>
+            <a id="browse" href="javascript:;">[Browse...]</a> 
+        </div>
+    </div>
+    <div id="normalUploadMode">
+        <div class="mb-3">
+            <input class="form-control" type="file" name="files[]" id="files" multiple @change="toggleFileFormatDropdown">
+        </div>
+        <div class="mb-3" v-if="showFileFormatDropdown">
+          <label for="fileFormat" class="form-label">Select File Format</label>
+          <select class="form-control" name="fileCompressionFormat" id="fileCompressionFormat">
+              @if(request()->route()->getName() === 'admin.files.create' || request()->route()->getName() === 'admin.files.personal.create')
+              <option value="none">none</option>
+              <option value="zip">zip</option>
+              <option value="tar">tar (.tar)</option>
+              @else
+              <option value="zip">zip</option>
+              <option value="tar">tar (.tar)</option>
+              @endif
+          </select>
+        </div>
     </div>
     @if(request()->route()->getName() !== 'admin.files.create')
     <div class="mb-3">

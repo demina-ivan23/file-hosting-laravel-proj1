@@ -16,17 +16,16 @@ class CookieService {
     }
     static function createCookie($cookieKey, $cookieVal){
         try{
+        $cookie = Cookie::make($cookieKey, $cookieVal, 14400)->withHttpOnly(false); // You can specify the expiration time if needed
+        $response = response('Cookie set')->withCookie($cookie);
         if(!static::cookieExists($cookieKey, $cookieVal))
         {
-            $cookie = Cookie::make($cookieKey, $cookieVal, 14400)->withHttpOnly(false); // You can specify the expiration time if needed
-            $response = response('Cookie set')->withCookie($cookie);
             $cookie = CanvasCookie::create([
                 'canvasId' => $cookieVal,
                 'userId' => auth()->id()
             ]);
-            return $response;
         }
-        return "Cookie already saved";
+        return $response;
         } catch(Exception $e)
         {
             return $e->getMessage();

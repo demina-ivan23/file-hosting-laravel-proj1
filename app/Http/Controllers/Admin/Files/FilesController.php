@@ -2,13 +2,16 @@
 
 namespace App\Http\Controllers\Admin\Files;
 
-use App\Services\FileService;
+use Exception;
 use App\Models\File;
 use App\Models\Message;
 use Illuminate\Http\Request;
+use App\Services\FileService;
 use App\Services\FileUploadService;
-use App\Http\Controllers\Controller;
 use App\Services\GlobalFileService;
+use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
+use JildertMiedema\LaravelPlupload\Facades\Plupload;
 
 class FilesController extends Controller
 {
@@ -44,11 +47,22 @@ class FilesController extends Controller
      */
     public function store(Request $request, $user)
     {
-        $result = FileService::sendFile($request, $user);
-        if (str_contains($result, 'Uploaded Successfully')) {
-            return redirect()->route('admin.files.dashboard')->with('success', $result);
-        } else {
-            return redirect()->route('admin.files.dashboard')->with('error', $result);
+        try {
+            if ($request->file('file')) {
+                $result = FileService::sendFileViaPlupload($request, $user);
+                return $result;
+            }
+            if ($request->hasFile('files')) {
+                $result = FileService::sendFile($request, $user);
+            }
+            if (str_contains($result, 'Uploaded Successfully')) {
+                return redirect()->route('admin.files.dashboard')->with('success', $result);
+            } else {
+                return redirect()->route('admin.files.dashboard')->with('error', $result);
+            }
+        } catch (Exception $e) {
+            log::info(json_encode($request));
+            Log::error('Error Uploading File: ' . $e->getMessage());
         }
     }
 
@@ -58,17 +72,15 @@ class FilesController extends Controller
     public function show(string $id)
     {
         $currentRoute = request()->route()->getName();
-        if($currentRoute === 'admin.files.show')
-        {
+        if ($currentRoute === 'admin.files.show') {
             $path = FileService::getPath($id);
-        if(!$path){
-            $message = 'File Not Found';
-            return redirect()->route('admin.files.dashboard')->with('error', $message);   
-        }
+            if (!$path) {
+                $message = 'File Not Found';
+                return redirect()->route('admin.files.dashboard')->with('error', $message);
+            }
             return response()->download($path);
-        }
-        else if($currentRoute === 'admin.global-files.pubid.show.public'){
-            $path = FileService::getPathByPubId($id);            
+        } else if ($currentRoute === 'admin.global-files.pubid.show.public') {
+            $path = FileService::getPathByPubId($id);
             if (!$path) {
                 $message = 'File Not Found';
                 return redirect()->route('admin.global-files.public')->with('error', $message);
@@ -76,14 +88,12 @@ class FilesController extends Controller
             $file = GlobalFileService::getFileByPubId($id);
             GlobalFileService::incrementDownloads($file);
             return response()->download($path);
-            
-        }
-        else if($currentRoute === 'admin.files.pubid.show.protected'){
-            $path = FileService::getPathByPubId($id);            
+        } else if ($currentRoute === 'admin.files.pubid.show.protected') {
+            $path = FileService::getPathByPubId($id);
             if (!$path) {
                 $message = 'File Not Found';
                 return redirect()->route('admin.global-files.protected')->with('error', $message);
-            } 
+            }
             $file = GlobalFileService::getFileByPubId($id);
             GlobalFileService::incrementDownloads($file);
             return response()->download($path);
