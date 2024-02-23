@@ -105,7 +105,7 @@
             @endif
                 @csrf
                 @if(request()->route()->getName() === 'admin.files.create')
-                <input type="hidden" value="{{$contact_user->publicId}}" id="contact_user_publicId"> 
+                <input type="hidden" value="{{$contact_user->publicId}}" id="contact_user_publicId"/> 
                 @endif
                 
 <div class="p-3">

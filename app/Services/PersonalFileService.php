@@ -122,8 +122,8 @@ class PersonalFileService
             }
             if (array_key_exists('path', $data)) {
                 if ($data['path']) {
-
                     $oldFile = File::where(['path' => $data['path']])->first();
+// dd($oldFile->receiver->id);
                     if ($oldFile->receiver->id !== $oldFile->sender->id) {
                         $oldFile->delete();
                         $file = File::create([
@@ -131,6 +131,7 @@ class PersonalFileService
                             'title' => $data['title'],
                             'description' => $data['description'],
                             'category' => $data['category'],
+                            'state' => 'active',
                             'sender_id' => $authUser->id,
                             'receiver_id' => $authUser->id
                         ]);

@@ -42,7 +42,7 @@ class PersonalFilesController extends Controller
         }
         else
         {
-            return redirect()->route('admin.files.personal.index')->with('error', $result);
+            return redirect()->route('admin.files.personal.dashboard')->with('error', $result);
         }
     }
 

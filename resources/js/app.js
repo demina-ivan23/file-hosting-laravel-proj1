@@ -58,7 +58,7 @@ const app = createApp({
             if(this.normalUploadMode){
                 if (form !== undefined && form !== null) {
                     const formAction = form.action;
-                    const contactUserIdElement = document.getElementById('contact_user_id');
+                    const contactUserIdElement = document.getElementById('contact_user_publicId');
                     const contact_user_id = contactUserIdElement ? contactUserIdElement.value : null;
                     if(formAction.includes("http://localhost:8000/files/send/"))
                     {
@@ -76,6 +76,7 @@ const app = createApp({
                             if (confirmed) {
                                 // Continue with form submission
                                 form.action = "http://localhost:8000/files/multiple/send/" + contact_user_id;
+                                console.log('hi');
                                 form.submit();
                             }
                         } else {

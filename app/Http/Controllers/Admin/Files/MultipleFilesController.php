@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Services\UserContactService;
 use App\Services\MultipleFilesService;
 use App\Http\Requests\Files\MultipleFilesRequest;
+use App\Services\UserService;
 
 class MultipleFilesController extends Controller
 {
@@ -32,13 +33,14 @@ class MultipleFilesController extends Controller
      */
     public function store(MultipleFilesRequest $request, $user)
     {
+      // dd('hail');
       $result = MultipleFilesService::sendFiles($request, $user);
       if(str_contains($result, 'Successfully'))
       {
-        return redirect()->route('admin.contacts.show', ['user' => $user->publicId])->with('success', $result);
+        return redirect()->route('admin.contacts.show', ['user' => $user])->with('success', $result);
       }
       else{
-        return redirect()->route('admin.contacts.show', ['user' => $user->publicId])->with('error', $result);
+        return redirect()->route('admin.contacts.show', ['user' => $user])->with('error', $result);
       }
     }
 

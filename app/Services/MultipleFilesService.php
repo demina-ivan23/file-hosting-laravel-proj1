@@ -43,7 +43,11 @@ class MultipleFilesService
     {
         try {
             $authUser = static::findUser(auth()->id());
-            $userReceiver = static::findUser($user);
+            $userReceiver = UserService::findUserByPublicId($user);
+            if(!$authUser->contacts->contains($userReceiver->id) || !$userReceiver->contacts->contains($authUser->id))
+            {
+                return 'You Are Not Contacts With This User';
+            }
             $data = $request->all();
             $fileCompressionFormat = $data['fileCompressionFormat'];
             if ($request->hasFile('files')) {

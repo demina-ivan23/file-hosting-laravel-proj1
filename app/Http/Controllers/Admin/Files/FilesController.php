@@ -48,10 +48,10 @@ class FilesController extends Controller
     public function store(Request $request, $user)
     {
         try {
-            if ($request->file('file')) {
-                $result = FileService::sendFileViaPlupload($request, $user);
-                return $result;
-            }
+            // if ($request->file('file')) {
+            //     $result = FileService::sendFileViaPlupload($request, $user);
+            //     return $result;
+            // }
             if ($request->hasFile('files')) {
                 $result = FileService::sendFile($request, $user);
             }

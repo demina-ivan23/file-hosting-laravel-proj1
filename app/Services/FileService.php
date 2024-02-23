@@ -39,12 +39,12 @@ class FileService
         }
     }
 
-    static function sendFile($request, $id)
+    static function sendFile($request, $publicId)
     {
         try {
             $authUser = UserService::findUser(auth()->id());
             $data = $request->all();
-            $userReciever = UserService::findUser($id);
+            $userReciever = UserService::findUserByPublicId($publicId);
             if ($request->hasFile('files')) {
                 $fileloader = new FileUploadService();
                 $path = $fileloader->UploadFile($data['files'][0]);
@@ -163,24 +163,21 @@ class FileService
             $sender->messages()->attach($message_to_sender);
             return 'File Deleted Successfully';
         }
-        //Notice: make the PersonalFileService and 
-        //PersonalFilesController take care of this part
-        // else if($file->receiver->id === auth()->id() && $file->sender->id === auth()->id())
-        // {
 
-        //     $fileloader = new FileUploadService();
-        //     $fileloader->deleteFile(str_replace( ['/', '\\'] ,DIRECTORY_SEPARATOR , $file->path));
-        //     $file->delete();
-        //     $message_to_yourself = Message::create([
-        //         'text' => 'You Have Deleted Your Personal File',
-        //         'system' => true,
-        //         'userReceiver' => $sender->id
-        //     ]);
-        // $sender->messages()->attach($message_to_yourself);
-        // return redirect(route('admin.files.personal.index'))->with('success', 'File Deleted Successfully');
+        else if($file->receiver->id === auth()->id() && $file->sender->id === auth()->id())
+        {
 
-        // }
-
+            $fileloader = new FileUploadService();
+            $fileloader->deleteFile(str_replace( ['/', '\\'] ,DIRECTORY_SEPARATOR , $file->path));
+            $file->delete();
+            $message_to_yourself = Message::create([
+                'text' => 'You Have Deleted Your Personal File',
+                'system' => true,
+                'userReceiver' => $sender->id
+            ]);
+        $sender->messages()->attach($message_to_yourself);
+        return 'File Deleted Successfully';
+        }
         else {
             return 'You Are Neither File\'s Sender Nor It\'s Receiver. But You Tried :)';
         }
