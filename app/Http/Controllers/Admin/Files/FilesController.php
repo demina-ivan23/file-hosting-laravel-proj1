@@ -48,10 +48,11 @@ class FilesController extends Controller
     public function store(Request $request, $user)
     {
         try {
-            // if ($request->file('file')) {
-            //     $result = FileService::sendFileViaPlupload($request, $user);
-            //     return $result;
-            // }
+            Log::info($request);
+            if ($request->file('file')) {
+                $result = FileService::sendFileViaPlupload($request, $user);
+                return $result;
+            }
             if ($request->hasFile('files')) {
                 $result = FileService::sendFile($request, $user);
             }
@@ -61,7 +62,6 @@ class FilesController extends Controller
                 return redirect()->route('admin.files.dashboard')->with('error', $result);
             }
         } catch (Exception $e) {
-            log::info(json_encode($request));
             Log::error('Error Uploading File: ' . $e->getMessage());
         }
     }

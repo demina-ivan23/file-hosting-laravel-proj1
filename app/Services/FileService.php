@@ -7,6 +7,7 @@ use App\Models\File;
 use App\Models\Message;
 use App\Models\GlobalFile;
 use App\Services\UserService;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 
@@ -70,18 +71,20 @@ class FileService
         try{
             $authUser = UserService::findUser(auth()->id());
             $userReciever = UserService::findUserByPublicId($id);
-                $path = $request['title'];
+            Log::info($request);
+            $fileloader = new FileUploadService();
+            $path = $fileloader->UploadFile($request['file']);
                 $file = File::create([
                     'path' => $path,
-                    // 'title' => $data['title'],
-                    // 'description' => $data['description'],
-                    // 'category' => $data['category'],
+                    'title' => $request['title'],
+                    'description' => $request['description'],
+                    'category' => $request['category'],
                     'state' => 'active',
                     'sender_id' => $authUser->id,
                     'receiver_id' => $userReciever->id
                 ]);
                 $authUser->sentFiles()->attach($file, ['userReceiver' => $userReciever->id]);
-                return 'File Uploaded Successfully';
+                 return 'File Uploaded Successfully';
         } catch (Exception $e) {
             return $e->getMessage();
         }

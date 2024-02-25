@@ -159,7 +159,7 @@ return [
         /*
          * Package Service Providers...
          */ 
-        JildertMiedema\LaravelPlupload\LaravelPluploadServiceProvider::class,
+        // JildertMiedema\LaravelPlupload\LaravelPluploadServiceProvider::class,
         
         
         
@@ -186,7 +186,7 @@ return [
 
     'aliases' => Facade::defaultAliases()->merge([
         // 'Example' => App\Facades\Example::class,
-        'Plupload' => JildertMiedema\LaravelPlupload\Facades\Plupload::class,
+        // 'Plupload' => JildertMiedema\LaravelPlupload\Facades\Plupload::class,
     ])->toArray(),
 
 ];

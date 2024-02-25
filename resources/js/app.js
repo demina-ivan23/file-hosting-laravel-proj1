@@ -156,66 +156,65 @@ const app = createApp({
             {
                 return;
             }
+            let uuid = crypto.randomUUID();
             let uploader;
             try {
-                if(currentUrl === 'http://localhost:8000/files/create/' + contactId){
+                
                 uploader = new plupload.Uploader({
                         browse_button: 'browse', 
                         runtimes: 'html5,flash,silverlight,html4',
-                        url: `/files/send/${contactId}`,
+                        url: `/files/plupload/upload`,
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                            'Content-Type': 'multipart/form-data'
+                            // 'Content-Type': 'multipart/form-data'
                         },
+                        chunk_size: '10240kb',
                         multipart: true,
+                        max_file_count: 1,
                         multipart_params: {
-                            'title' : document.getElementById('title').value,
-                            'description': document.getElementById('description').value,
-                            'category': document.getElementById('category').value
+                            'uuid': uuid 
                         },
-        
                         file_data_name: 'file',
                        
                     });
-                }
+               
             } catch (error) {
                 console.error('Error initializing uploader:', error);
-            }
-            if(currentUrl === 'http://localhost:8000/global-files/protected/create'){
-            uploader = new plupload.Uploader({
-                    browse_button: 'browse', 
-                    url: '/global-files/store'
-                });
-            }
-            if(currentUrl === 'http://localhost:8000/global-files/public/create'){
-            uploader = new plupload.Uploader({
-                    browse_button: 'browse', 
-                    url: '/global-files/store' 
-                });
-            }
-            if(currentUrl === 'http://localhost:8000/files/personal/create'){
-            uploader = new plupload.Uploader({
-                        browse_button: 'browse', 
-                        url: '/files/personal/store' 
-                    });
-                }
-            
+            }            
               uploader.init();
+              let maxCountError;
               uploader.bind('FilesAdded', function(up, files) {
-                let html = '';
-                plupload.each(files, function(file) {
-                  html += '<li id="' + file.id + '" name="file">' + file.name + ' (' + plupload.formatSize(file.size) + ') <b></b></li>';
-                  console.log(file);
-                });
-                document.getElementById('filelist').innerHTML += html;
-              });
+                var i = up.files.length,
+                maxCountError = false;
+        
+            plupload.each(files, function (file) {
+        
+                if(uploader.settings.max_file_count && i > uploader.settings.max_file_count){
+                    maxCountError = true;
+                    setTimeout(function(){ up.removeFile(file); }, 50);
+                }else{
+                    // Code to add pending file details, if you want
+                }
+        
+                i++;
+            });
+            
+            let html = '';
+            plupload.each(files, function(file) {
+                html += '<li id="' + file.id + '" name="file">' + file.name + ' (' + plupload.formatSize(file.size) + ') <b></b></li>';
+                console.log(file);
+            });
+            if(maxCountError){
+                html+= '<li>You can select only one file</li>';
+            }
+            document.getElementById('filelist').innerHTML += html;
+        });
               uploader.bind('Error', function(up, err) {
                 document.getElementById('console').innerHTML += "\nError #" + err.code + ": " + err.message;
               });
               uploader.bind('FilesUploaded', function (up, files) {
                 // All files have been successfully uploaded
                 // You can now submit the form
-                console.log(files);
                 form.submit();
             });
               uploader.bind('UploadProgress', function(up, file) {

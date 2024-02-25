@@ -28,3 +28,5 @@ Route::delete('/multiple/delete', [MultipleFilesController::class, 'destroy'])->
 Route::get('/personal/create', [PersonalFilesController::class, 'create'])->name('personal.create');
 Route::post('/personal/store', [PersonalFilesController::class, 'store'])->name('personal.store');
 Route::get('/personal', [PersonalFilesController::class, 'index'])->name('personal.dashboard');
+
+Route::post('/files/plupload/upload', [PluploadUploadController::class, 'store']);

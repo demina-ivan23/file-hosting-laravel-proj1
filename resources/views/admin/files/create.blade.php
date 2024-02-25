@@ -128,7 +128,7 @@
         <label for="fileUoladType">Select The File Upload Type</label>
         <select class="form-control" name="fileUploadType" id="fileUploadType" @change="handleFileUploadModeChange">
             <option value="normal">For small and medium size files</option>
-            <option value="bigSize">For big files (archivation is unavailable)</option>
+            <option value="bigSize">For big files (Only one file at a time upload)</option>
         </select>
     </div>
     <div id="bigFilesUploadMode" hidden>
@@ -194,22 +194,4 @@
 @endsection
 @section('scripts')
 @vite(['resources/js/plupload-2.3.9/js/plupload.full.min.js'])
-@endsection
-@section('scripts')
-
-<script type="text/javascript">
-var uploader = new plupload.Uploader({
-  browse_button: 'browse', // this can be an id of a DOM element or the DOM element itself
-  url: 'upload.php'
-});
-uploader.init();
-uploader.bind('FilesAdded', function(up, files) {
-  var html = '';
-  plupload.each(files, function(file) {
-    html += '<li id="' + file.id + '">' + file.name + ' (' + plupload.formatSize(file.size) + ') <b></b></li>';
-  });
-  document.getElementById('filelist').innerHTML += html;
-});
- 
-</script>
 @endsection
