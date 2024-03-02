@@ -8,6 +8,7 @@ use App\Models\File;
 use App\Models\User;
 use App\Models\GlobalFile;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 use App\Services\ArchiveMakers\TarArchiveMaker;
 use App\Services\ArchiveMakers\ZipArchiveMaker;
 
@@ -144,6 +145,33 @@ class PersonalFileService
             }
         } catch (Exception $e) {
             return $e->getMessage();
+        }
+    }
+    static function saveFileViaPlupload($request)
+    {
+        try {
+            $authUser = UserService::findUser(auth()->id());
+            
+            $uuid = $request->input('uuid');
+      
+            $filename = Str::random(10).'.'.$request->input('extension'); 
+            
+            $response = PluploadUploadService::assembleChunks($uuid, $filename);
+
+            $file = File::create([
+                    'path' => 'files'. DIRECTORY_SEPARATOR .$filename,
+                    'title' => $request['title'],
+                    'description' => $request['description'],
+                    'category' => $request['category'],
+                    'state' => 'active',
+                    'sender_id' => $authUser->id,
+                    'receiver_id' => $authUser->id,
+                ]);
+                $authUser->sentFiles()->attach($file, ['userReceiver' => $authUser->id]);
+            return 'File Sent Successfully';
+        } catch (Exception $e) {
+            Log::error($e->getMessage());
+            return 'Error: ' . $e->getMessage();
         }
     }
 }

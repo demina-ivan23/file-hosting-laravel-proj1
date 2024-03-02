@@ -6,6 +6,7 @@ use Exception;
 use App\Models\File;
 use App\Models\Message;
 use App\Models\GlobalFile;
+use Illuminate\Support\Str;
 use App\Services\UserService;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Gate;
@@ -68,25 +69,30 @@ class FileService
     }
     static function sendFileViaPlupload($request, $id)
     {
-        try{
+        try {
             $authUser = UserService::findUser(auth()->id());
-            $userReciever = UserService::findUserByPublicId($id);
-            Log::info($request);
-            $fileloader = new FileUploadService();
-            $path = $fileloader->UploadFile($request['file']);
-                $file = File::create([
-                    'path' => $path,
+            $userReceiver = UserService::findUserByPublicId($id);
+            
+            $uuid = $request->input('uuid');
+      
+            $filename = Str::random(10).'.'.$request->input('extension'); 
+            
+            $response = PluploadUploadService::assembleChunks($uuid, $filename);
+
+            $file = File::create([
+                    'path' => 'files'. DIRECTORY_SEPARATOR .$filename,
                     'title' => $request['title'],
                     'description' => $request['description'],
                     'category' => $request['category'],
                     'state' => 'active',
                     'sender_id' => $authUser->id,
-                    'receiver_id' => $userReciever->id
+                    'receiver_id' => $userReceiver->id
                 ]);
-                $authUser->sentFiles()->attach($file, ['userReceiver' => $userReciever->id]);
-                 return 'File Uploaded Successfully';
+                $authUser->sentFiles()->attach($file, ['userReceiver' => $userReceiver->id]);
+            return 'File Sent Successfully';
         } catch (Exception $e) {
-            return $e->getMessage();
+            Log::error($e->getMessage());
+            return 'Error: ' . $e->getMessage();
         }
     }
    

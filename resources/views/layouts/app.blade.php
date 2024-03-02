@@ -103,8 +103,11 @@
 
                                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                                     <a class="dropdown-item" href="{{ route('admin.files.dashboard') }}">
-                                       Manage
+                                       All (Not Global)
                                     </a>
+                                    <a class="dropdown-item" href="{{ route('admin.files.personal.dashboard') }}">
+                                        Personal
+                                     </a>
 
                                 </div>
                             </li>

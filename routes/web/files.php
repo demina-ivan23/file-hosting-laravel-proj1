@@ -3,6 +3,7 @@
 use App\Models\UserContact;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PluploadUploadController;
 use App\Http\Controllers\Admin\Files\FilesController;
 use App\Http\Controllers\Admin\Files\MultipleFilesController;
 use App\Http\Controllers\Admin\Files\PersonalFilesController;
@@ -29,4 +30,4 @@ Route::get('/personal/create', [PersonalFilesController::class, 'create'])->name
 Route::post('/personal/store', [PersonalFilesController::class, 'store'])->name('personal.store');
 Route::get('/personal', [PersonalFilesController::class, 'index'])->name('personal.dashboard');
 
-Route::post('/files/plupload/upload', [PluploadUploadController::class, 'store']);
+Route::post('/plupload/upload', [PluploadUploadController::class, 'store']);

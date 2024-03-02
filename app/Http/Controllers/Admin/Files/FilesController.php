@@ -49,14 +49,13 @@ class FilesController extends Controller
     {
         try {
             Log::info($request);
-            if ($request->file('file')) {
+            if ($request['uuid'] && $request['fileUploadMode'] === 'bigSize' && $request['extension']) {
                 $result = FileService::sendFileViaPlupload($request, $user);
-                return $result;
             }
             if ($request->hasFile('files')) {
                 $result = FileService::sendFile($request, $user);
             }
-            if (str_contains($result, 'Uploaded Successfully')) {
+            if (str_contains($result, 'Successfully')) {
                 return redirect()->route('admin.files.dashboard')->with('success', $result);
             } else {
                 return redirect()->route('admin.files.dashboard')->with('error', $result);

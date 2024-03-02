@@ -11,6 +11,7 @@ use App\Models\Message;
 use App\Models\GlobalFile;
 use Illuminate\Support\Str;
 use App\Models\CanvasCookie;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use App\Services\ArchiveMakers\TarArchiveMaker;
@@ -34,52 +35,52 @@ class GlobalFileService
 
         return $filteredFiles;
     }
-    static function storeProtectedFile($request)
-    {
-        if ($request->hasFile('files')) {
-            $path = ' ';
-            $authUser = static::findUser(auth()->id());
-            $data = $request->all();
-            if (count($data['files']) > 1) {
-                if ($data['fileCompressionFormat'] === 'none') {
-                    return 'You Cannot Post Multiple Global Files Without Any Compression Format Selected';
-                } else if ($data['fileCompressionFormat'] === 'tar') {
-                    $archivemaker = new TarArchiveMaker(new FileUploadService());
-                    $archive_name = Str::random(20) . '.tar';
-                    $archive = $archivemaker->makeArchive($data['files'], $archive_name);
-                    $path = str_replace(['/', '\\'], DIRECTORY_SEPARATOR,  'files/archives/' . $archive_name);
-                } else if ($data['fileCompressionFormat'] === 'zip') {
-                    $archivemaker = new ZipArchiveMaker(new FileUploadService());
-                    $archive_name = Str::random(20) . '.zip';
-                    $archive = $archivemaker->makeArchive($data['files'], $archive_name);
-                    $path = str_replace(['/', '\\'], DIRECTORY_SEPARATOR,  'files/archives/' . $archive_name);
-                } else {
-                    return 'Unknown File Compression Format';
-                }
-            } else {
-                $fileloader = new FileUploadService();
-                $path = $fileloader->UploadFile($data['files'][0]);
-            }
-        } else {
-            return 'No Files Selected';
-        }
-        $file_path = public_path('storage\\' . $path);
-        $file_path = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $file_path);
-        $file = GlobalFile::create([
-            'path' => $path,
-            'title' => $data['title'],
-            'description' => $data['description'],
-            'category' => $data['category'],
-            'isPublic' => false,
-            'state' => 'active',
-            'publicId' => Str::random(30),
-            'owner_id' => $authUser->id,
-            'expireDate' => Carbon::now()->addDays(30),
-            'mimeType' => mime_content_type($file_path)
-        ]);
-        $authUser->ownedGlobalFiles()->attach($file);
-        return 'Contacts-only File Uploaded Successfully';
-    }
+    // static function storeProtectedFile($request)
+    // {
+    //     if ($request->hasFile('files')) {
+    //         $path = ' ';
+    //         $authUser = static::findUser(auth()->id());
+    //         $data = $request->all();
+    //         if (count($data['files']) > 1) {
+    //             if ($data['fileCompressionFormat'] === 'none') {
+    //                 return 'You Cannot Post Multiple Global Files Without Any Compression Format Selected';
+    //             } else if ($data['fileCompressionFormat'] === 'tar') {
+    //                 $archivemaker = new TarArchiveMaker(new FileUploadService());
+    //                 $archive_name = Str::random(20) . '.tar';
+    //                 $archive = $archivemaker->makeArchive($data['files'], $archive_name);
+    //                 $path = str_replace(['/', '\\'], DIRECTORY_SEPARATOR,  'files/archives/' . $archive_name);
+    //             } else if ($data['fileCompressionFormat'] === 'zip') {
+    //                 $archivemaker = new ZipArchiveMaker(new FileUploadService());
+    //                 $archive_name = Str::random(20) . '.zip';
+    //                 $archive = $archivemaker->makeArchive($data['files'], $archive_name);
+    //                 $path = str_replace(['/', '\\'], DIRECTORY_SEPARATOR,  'files/archives/' . $archive_name);
+    //             } else {
+    //                 return 'Unknown File Compression Format';
+    //             }
+    //         } else {
+    //             $fileloader = new FileUploadService();
+    //             $path = $fileloader->UploadFile($data['files'][0]);
+    //         }
+    //     } else {
+    //         return 'No Files Selected';
+    //     }
+    //     $file_path = public_path('storage\\' . $path);
+    //     $file_path = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $file_path);
+    //     $file = GlobalFile::create([
+    //         'path' => $path,
+    //         'title' => $data['title'],
+    //         'description' => $data['description'],
+    //         'category' => $data['category'],
+    //         'isPublic' => false,
+    //         'state' => 'active',
+    //         'publicId' => Str::random(30),
+    //         'owner_id' => $authUser->id,
+    //         'expireDate' => Carbon::now()->addDays(30),
+    //         'mimeType' => mime_content_type($file_path)
+    //     ]);
+    //     $authUser->ownedGlobalFiles()->attach($file);
+    //     return 'Contacts-only File Uploaded Successfully';
+    // }
     static function getFileByPubId($publicId)
     {
         $file = GlobalFile::where('publicId', $publicId)->first();
@@ -88,10 +89,69 @@ class GlobalFileService
         }
         return $file;
     }
-    static function storePublicFile($request)
+    static function storeFileViaPlupload($request)
+    {
+        try {
+            $authUser = UserService::findUser(auth()->id());
+            
+            $uuid = $request->input('uuid');
+            
+            // $sourceFolder = storage_path(str_replace(['/', '\\'], DIRECTORY_SEPARATOR, 'app/temp_files/' . $uuid));
+            
+            // $files = scandir($sourceFolder);
+            // dd($files);
+            // $mergedContent = '';
+            // foreach ($files as $file) {
+            //     if ($file !== '.' && $file !== '..') {
+            //         $filePath = $sourceFolder . DIRECTORY_SEPARATOR . $file;
+            //         $mergedContent .= file_get_contents($filePath);
+            //     }
+            // }
+            
+            // $destinationFolder = storage_path(str_replace(['/', '\\'], DIRECTORY_SEPARATOR, 'app/public/files/'));
+
+            $filename = Str::random(10).'.'.$request->input('extension'); 
+            $response = PluploadUploadService::assembleChunks($uuid, $filename);
+            // dd($response);
+            // $ok = file_put_contents($destinationFolder . DIRECTORY_SEPARATOR . $filename, $mergedContent);
+            // // dd($ok);
+            // Storage::deleteDirectory($sourceFolder);
+            $isPublic = false;
+            if($request['fileAccessibility'] === 'public')
+            {
+                $isPublic = true;
+            }
+            $path = 'files'. DIRECTORY_SEPARATOR . $filename;
+            $file_path = public_path('storage\\' . $path);
+            $file_path = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $file_path);
+            $file = GlobalFile::create([
+                    'path' => $path,
+                    'title' => $request['title'],
+                    'description' => $request['description'],
+                    'category' => $request['category'],
+                    'isPublic' => $isPublic,
+                    'state' => 'active',
+                    'publicId' => Str::random(30),
+                    'owner_id' => $authUser->id,
+                    'expireDate' => Carbon::now()->addDays(30),
+                    'mimeType' => mime_content_type($file_path)
+                ]);
+                $authUser->ownedGlobalFiles()->attach($file->id);
+                return 'File Posted Successfully';
+        } catch (Exception $e) {
+            Log::error($e->getMessage());
+            return 'Error: ' . $e->getMessage();
+        }
+    }
+    static function storeGlobalFile($request)
     {
         if ($request->hasFile('files')) {
             $path = '';
+            $isPublic = false;
+            if($request['fileAccessibility'] == 'public')
+            {
+                $isPublic = true;
+            }
             $authUser = static::findUser(auth()->id());
             $data = $request->all();
             if (count($data['files']) > 1) {
@@ -125,7 +185,7 @@ class GlobalFileService
             'title' => $data['title'],
             'description' => $data['description'],
             'category' => $data['category'],
-            'isPublic' => true,
+            'isPublic' => $isPublic,
             'state' => 'active',
             'publicId' => Str::random(30),
             'owner_id' => $authUser->id,
@@ -134,7 +194,7 @@ class GlobalFileService
 
         ]);
         $authUser->ownedGlobalFiles()->attach($file);
-        return 'Public File Uploaded Successfully';
+        return 'File Uploaded Successfully';
     }
     static function getFilesFromArchive($file)
     {

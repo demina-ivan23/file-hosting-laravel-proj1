@@ -95,7 +95,7 @@
             
             <hr>
             @if(request()->route()->getName() === 'admin.files.create')
-              <form action="{{ route('admin.files.store', ['user' => $contact_user->id]) }}" method="POST" enctype="multipart/form-data" id="file-sending-form" @submit.prevent="handleFormSubmit">
+              <form action="{{ route('admin.files.store', ['user' => $contact_user->publicId]) }}" method="POST" enctype="multipart/form-data" id="file-sending-form" @submit.prevent="handleFormSubmit">
             @endif
             @if(request()->route()->getName() === 'admin.files.personal.create')
             <form action="{{ route('admin.files.personal.store') }}" method="POST" enctype="multipart/form-data" name="file-sending-form" id="file-sending-form" @submit.prevent="handleFormSubmit">
@@ -125,8 +125,8 @@
         <input class="form-control" type="text" name="category" id="category" placeholder="Category...">
     </div>
     <div class="mb-3">
-        <label for="fileUoladType">Select The File Upload Type</label>
-        <select class="form-control" name="fileUploadType" id="fileUploadType" @change="handleFileUploadModeChange">
+        <label for="fileUploadMode">Select The File Upload Type</label>
+        <select class="form-control" name="fileUploadMode" id="fileUploadType" @change="handleFileUploadModeChange">
             <option value="normal">For small and medium size files</option>
             <option value="bigSize">For big files (Only one file at a time upload)</option>
         </select>
@@ -138,6 +138,9 @@
             <br />
             <pre id="console"></pre>
             <a id="browse" href="javascript:;">[Browse...]</a> 
+            <input type="hidden" id="uuid" name="uuid" value="">
+            <input type="hidden" id="extension" name="extension" value="">
+
         </div>
     </div>
     <div id="normalUploadMode">
@@ -179,7 +182,8 @@
             @endif
         </select>
     </div>
-    @endif    
+    @endif   
+     
         <button class="btn btn-primary float-end mb-2" type="submit" id="formSubmit" @click="handleFormSubmit">
             Send
         </button>

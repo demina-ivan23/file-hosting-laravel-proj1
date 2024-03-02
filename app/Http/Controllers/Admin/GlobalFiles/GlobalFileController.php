@@ -38,15 +38,16 @@ class GlobalFileController extends Controller
      */
     public function store(Request $request)
     {
-        if ($request['fileAccessibility'] == 'protected') {
-            $result = GlobalFileService::storeProtectedFile($request);
+        if($request['uuid'])
+        {
+            $result = GlobalFileService::storeFileViaPlupload($request);
             if (str_contains($result, 'Successfully')) {
-                return redirect()->route('admin.global-files.protected')->with('success', $result);
+                return redirect()->route('admin.global-files.public')->with('success', $result);
             } else {
-                return redirect()->route('admin.global-files.protected')->with('error', $result);
+                return redirect()->route('admin.global-files.public')->with('error', $result);
             }
-        } else if ($request['fileAccessibility'] == 'public') {
-            $result = GlobalFileService::storePublicFile($request);
+        } else {
+            $result = GlobalFileService::storeGlobalFile($request);
             if (str_contains($result, 'Successfully')) {
                 return redirect()->route('admin.global-files.public')->with('success', $result);
             } else {
@@ -54,6 +55,7 @@ class GlobalFileController extends Controller
             }
         }
     }
+    
 
     /**
      * Display the specified resource.

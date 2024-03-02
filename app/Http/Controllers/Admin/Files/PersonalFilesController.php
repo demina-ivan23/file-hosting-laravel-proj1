@@ -35,7 +35,14 @@ class PersonalFilesController extends Controller
      */
     public function store(Request $request)
     {
-        $result = PersonalFileService::storeFile($request);
+        if ($request['uuid'] && $request['fileUploadMode'] === 'bigSize') {
+            if($request['extension'])
+            {
+                $result = PersonalFileService::saveFileViaPlupload($request);
+            }
+        } else {
+            $result = PersonalFileService::storeFile($request);
+        }
         if(str_contains($result, 'Successfully'))
         {
             return redirect()->route('admin.files.personal.dashboard')->with('success', $result);

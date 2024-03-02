@@ -19,18 +19,7 @@ class FileUploadService
             $disk
         );
     }
-    public function moveUploadedFile($sourcePath, $destinationDirectory)
-    {
-        // Generate a unique name for the file within the destination directory
-        $destinationFileName = uniqid() . '_archive.zip';
-
-        // Move the file to the desired directory within storage
-        Storage::move($sourcePath, $destinationDirectory . '/' . $destinationFileName);
-
-        // Return the path to the moved file
-        return $destinationDirectory . '/' . $destinationFileName;
-    }
-
+    
     public function deleteFile($path, $disk = 'public')
     {
         Storage::disk($disk)->delete($path);
