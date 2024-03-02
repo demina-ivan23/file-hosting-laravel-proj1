@@ -62,8 +62,8 @@
             <div class="col-sm-1 d-flex justify-content-center align-items-center">
                 <form action="{{ route('admin.files.personal.store') }}" method="POST">
                     @csrf
-                    
-                    <input type="hidden" name="file" value="{{ $file->id }}">
+                    <input type="hidden" name="global" value="{{true}}">
+                    <input type="hidden" name="publicId" value="{{ $file->publicId }}">
                     <input type="hidden" name="path" value="{{ $file->path }}">
                     <input type="hidden" name="title" value="{{ $file->title }}">
                     <input type="hidden" name="description" value="{{ $file->description }}">

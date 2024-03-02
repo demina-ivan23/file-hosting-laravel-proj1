@@ -41,7 +41,12 @@ class PersonalFilesController extends Controller
                 $result = PersonalFileService::saveFileViaPlupload($request);
             }
         } else {
-            $result = PersonalFileService::storeFile($request);
+            if($request['global'] && $request['global'] == true)
+            {
+                $result = PersonalFileService::copyGlobalFile($request['publicId']);
+            } else {
+                $result = PersonalFileService::storeFile($request);
+            }
         }
         if(str_contains($result, 'Successfully'))
         {

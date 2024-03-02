@@ -147,6 +147,20 @@ class PersonalFileService
             return $e->getMessage();
         }
     }
+    static function copyGlobalFile($publicId){
+        $authUser = UserService::findUser(auth()->id());
+        $file = GlobalFileService::getFileByPubId($publicId);
+        $personalFile = File::create([
+            'path' =>  $file->path,
+            'title' => $file->title,
+            'description' => $file->description,
+            'category' => $file->category,
+            'state' => 'active',
+            'sender_id' => $authUser->id,
+            'receiver_id' => $authUser->id
+        ]);
+        $authUser->sentFiles()->attach($personalFile, ['userReceiver' => $authUser->id]);
+    }
     static function saveFileViaPlupload($request)
     {
         try {
