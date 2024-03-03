@@ -8,6 +8,7 @@ use App\Services\FileService;
 use App\Services\GlobalFileService;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use App\Services\UserService;
 
 class FilesController extends Controller
 {
@@ -36,7 +37,10 @@ class FilesController extends Controller
     public function store(Request $request, $user)
     {
         try {
-            Log::info($request);
+            $user = UserService::findUserByPublicId($user);
+            if(!$user->contacts->contains(auth()->id())){
+                abort(403, 'You Are Not Contacts With This User');
+            }
             if ($request['uuid'] && $request['fileUploadMode'] === 'bigSize' && $request['extension']) {
                 $result = FileService::sendFileViaPlupload($request, $user);
             }

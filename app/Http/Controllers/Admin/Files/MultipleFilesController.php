@@ -33,7 +33,10 @@ class MultipleFilesController extends Controller
      */
     public function store(MultipleFilesRequest $request, $user)
     {
-      // dd('hail');
+      $user = UserService::findUserByPublicId($user);
+      if(!$user->contacts->contains(auth()->id())){
+          abort(403, 'You Are Not Contacts With This User');
+      }
       $result = MultipleFilesService::sendFiles($request, $user);
       if(str_contains($result, 'Successfully'))
       {

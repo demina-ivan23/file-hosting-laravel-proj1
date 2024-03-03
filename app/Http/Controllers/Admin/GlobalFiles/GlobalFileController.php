@@ -67,11 +67,15 @@ class GlobalFileController extends Controller
         if($currentRoute === 'admin.global-files.show')
         {
             $file = GlobalFileService::getFileByPubId($id);
-            if($file->mimeType === "application/zip"){
-                $files = GlobalFileService::getFilesFromArchive($file);
-            return view('admin.global-files.show', ['file' => $file, 'extracted_files' => $files]);
+            if($file->isPublic == false && !$file->owner->contacts->contains(auth()->id()))
+            {
+                abort(403, 'This Is Contacts-only File And You Are Not In Contacts Of The Owner');
             }
             GlobalFileService::incrementViews($file);
+            if($file->mimeType === "application/zip"){
+            $files = GlobalFileService::getFilesFromArchive($file);
+            return view('admin.global-files.show', ['file' => $file, 'extracted_files' => $files]);
+        }
             return view('admin.global-files.show', ['file' => $file, 'extracted_files' => null]);
         }
         if($currentRoute === 'admin.global-files.show.like')
