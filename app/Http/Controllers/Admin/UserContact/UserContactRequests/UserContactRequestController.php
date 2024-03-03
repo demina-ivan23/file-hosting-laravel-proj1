@@ -2,10 +2,7 @@
 
 namespace App\Http\Controllers\Admin\UserContact\UserContactRequests;
 
-use App\Models\User;
-use App\Models\Message;
 use Illuminate\Http\Request;
-use App\Models\UserContactRequest;
 use App\Http\Controllers\Controller;
 use App\Services\UserContactRequestService;
 
@@ -72,7 +69,16 @@ class UserContactRequestController extends Controller
      */
     public function destroy(string $id, string $state)
     {
-        $result = UserContactRequestService::deleteRequest($id, $state);
+        $currentRoute = request()->route()->getName();
+        if($currentRoute === 'admin.contacts.requests.delete')
+        {
+            $result = UserContactRequestService::deleteRequest($id, $state);
+        }
+        if($currentRoute === 'admin.contacts.requests.delete-block')
+        {
+            $result = UserContactRequestService::deleteRequestAndBlockUser($id, $state);
+        }
+        
         if(str_contains($result, 'Successfully')){
             return redirect()->route('admin.contacts.requests.dashboard')->with('success', $result);
         }

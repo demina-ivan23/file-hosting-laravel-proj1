@@ -36,7 +36,11 @@
     
     <button class="btn btn-outline-primary" type="submit">Decline</button>
     </form>
-    <a class="btn btn-outline-primary" href="#">Decline And Block User</a>
+    <form action="{{route('admin.contacts.requests.delete-block', ['publicId' => $request->publicId, 'state' => 'declined'])}}" method="POST">
+        @csrf
+        @method('DELETE')
+        <button class="btn btn-outline-primary" type="submit">Decline And Block User</button>
+    </form>
 </div>
 @endif
 @if($request->sender->id === auth()->id())
