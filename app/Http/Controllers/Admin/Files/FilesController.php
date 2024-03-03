@@ -20,17 +20,9 @@ class FilesController extends Controller
      */
     public function index()
     {
-        $currentRoute = request()->route()->getName();
-        if ($currentRoute === 'admin.files.dashboard') {
-            $files = FileService::getAllFiles();
-        }
-        // if ($currentRoute === 'admin.files.received') {
-        //     $files = FileService::getReceivedFiles();
-        // }
-        // if ($currentRoute === 'admin.files.sent') {
-        //     $files = FileService::getSentFiles();
-        // }
-        return view('admin.files.index', ['files' => $files]);
+        $categories = FileService::getAllCategories();   
+        $files = FileService::getAllFiles();
+        return view('admin.files.index', ['files' => $files, 'categories' => $categories]);
     }
 
     /**

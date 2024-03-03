@@ -188,4 +188,18 @@ class PersonalFileService
             return 'Error: ' . $e->getMessage();
         }
     }
+    static function getAllCategories()
+    {
+        $files = File::where('sender_id', auth()->id())
+        ->where('receiver_id', auth()->id())
+        ->get();
+        $categories[] = '';
+        foreach ($files as $file) {
+         if(!in_array($file->category, $categories) && $file->category !== null)
+         {
+             $categories[] = $file->category;
+        }
+        } 
+        return $categories;
+    }
 }

@@ -38,6 +38,19 @@
               </div>
             </div>
             <div class="ml-auto" style="margin-left: auto">
+              <div class="dropdown">
+                <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  Filter By Category
+                </button>
+                <ul class="dropdown-menu">
+                  @foreach ($categories as $category)
+                  <li><a class="dropdown-item" href="{{route('admin.files.dashboard', ['category' => $category])}}">{{$category}}</a></li>
+                  @endforeach
+                  <li><a class="dropdown-item" href="{{route('admin.files.dashboard')}}">All</a></li>
+                </ul>
+              </div>
+              </div>
+            <div class="ml-auto" style="margin-left: auto">
 
               <div class="dropdown">
                 <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">

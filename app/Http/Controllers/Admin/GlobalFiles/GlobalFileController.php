@@ -16,11 +16,13 @@ class GlobalFileController extends Controller
     {
         $currentRoute = $request->route()->getName();
         if ($currentRoute === 'admin.global-files.public') {
+            $categories = GlobalFileService::getAllCategories(true);
             $publicFiles = GlobalFileService::getAllPublicFiles();
-            return view('admin.global-files.public.index', ['files' => $publicFiles]);
+            return view('admin.global-files.public.index', ['files' => $publicFiles, 'categories' => $categories]);
         } else if ($currentRoute === 'admin.global-files.protected') {
+            $categories = GlobalFileService::getAllCategories(false);
             $protectedFiles = GlobalFileService::getAllProtectedFiles();
-            return view('admin.global-files.protected.index', ['files' => $protectedFiles]);
+            return view('admin.global-files.protected.index', ['files' => $protectedFiles, 'categories' => $categories]);
         }
     }
 

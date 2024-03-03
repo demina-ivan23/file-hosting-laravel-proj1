@@ -191,4 +191,18 @@ class FileService
             return 'You Are Neither File\'s Sender Nor It\'s Receiver. But You Tried :)';
         }
     }
+    static function getAllCategories()
+    {
+        $files = File::where('sender_id', auth()->id())
+        ->orWhere('receiver_id', auth()->id())
+        ->get();
+        $categories[] = '';
+        foreach ($files as $file) {
+         if(!in_array($file->category, $categories) && $file->category !== null)
+         {
+             $categories[] = $file->category;
+        }
+        } 
+        return $categories;
+    }
 }

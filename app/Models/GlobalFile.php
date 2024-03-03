@@ -81,6 +81,11 @@ class GlobalFile extends Model
                 //
             }
         }
+        if (request()->has('category')) {
+                $category = request('category');
+                $query
+                    ->where('category', $category);
+        }
         else {
             return $query->latest();
         }

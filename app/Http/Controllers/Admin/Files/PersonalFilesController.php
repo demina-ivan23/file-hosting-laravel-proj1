@@ -18,8 +18,9 @@ class PersonalFilesController extends Controller
      */
     public function index()
     {
-       $files = PersonalFileService::getAllPersonalFiles(auth()->id());
-        return view('admin.files.personal.index', ['files' => $files]);
+        $files = PersonalFileService::getAllPersonalFiles(auth()->id());
+        $categories = PersonalFileService::getAllCategories();
+        return view('admin.files.personal.index', ['files' => $files, 'categories' => $categories]);
     }
 
     /**

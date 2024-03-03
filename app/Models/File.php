@@ -77,6 +77,11 @@ class File extends Model
                 $query->where('receiver_id', $authUser->id);
             }
         }
+        if (request()->has('category')) {
+            $category = request('category');
+            $query
+                ->where('category', $category);
+    }
         return $query;
     }
 }
