@@ -54,6 +54,11 @@
                                     <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
                                 </li>
                             @endif
+                            <li class="nav-item dropdown">
+                                <a class="dropdown-item mt-2" style="margin: 0px 10px" href="{{ route('admin.global-files.public') }}">
+                                    Public Global Files
+                                 </a>
+                            </li>
                         @else
                             <li class="nav-item dropdown">
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
@@ -61,9 +66,6 @@
                                 </a>
 
                                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                    <a class="dropdown-item" href="{{ route('user.home') }}">
-                                        Home
-                                     </a>
                                      <a class="dropdown-item" href="{{ route('user.profile', ['user' => auth()->user()->publicId]) }}">
                                         Profile
                                      </a>
@@ -139,7 +141,13 @@
                                 </div>
                             </li>
                         @endguest
-                    </ul>
+                        <li class="nav-item dropdown">
+                                <a class="dropdown-item mt-2" href="{{ route('home') }}">
+                                   Home
+                                </a>
+                        </li>
+                       
+                        </ul>
                 </div>
             </div>
         </nav>

@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use PharData;
 use Exception;
 use ZipArchive;
 use Carbon\Carbon;
@@ -12,8 +11,6 @@ use App\Models\GlobalFile;
 use Illuminate\Support\Str;
 use App\Models\CanvasCookie;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Storage;
 use App\Services\ArchiveMakers\TarArchiveMaker;
 use App\Services\ArchiveMakers\ZipArchiveMaker;
 

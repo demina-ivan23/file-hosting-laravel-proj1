@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Admin\GlobalFiles;
 
-use App\Models\GlobalFile;
 use Illuminate\Http\Request;
 use App\Services\GlobalFileService;
 use App\Http\Controllers\Controller;

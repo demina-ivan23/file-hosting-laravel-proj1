@@ -18,7 +18,7 @@ class RedirectIfRoot
         // Check if the request is for the root ("/") page
         if ($request->is('/')) {
             // Redirect to the desired page (e.g., "/dashboard")
-            return redirect('/global-files/public');
+            return redirect('/home');
         }
 
         // Continue with the request if not accessing the root page
