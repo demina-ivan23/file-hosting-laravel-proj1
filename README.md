@@ -7,6 +7,16 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
+## About the project
+First, I want to tell you, that I have made two terrible mistakes when I was making this project: I started without a plan and a proper front-end layout (started from the back-end, so to speak). So this project took almost 3 months of my coding time. But, even considering that two mistakes, this is, in my opinion, still a decent project, worthy of your attention.
+
+Next, I will shortly describe the project itself. 
+So, without any registration, you can only preview and download public files, which are public because are accessible to anyone. Also, you can visit a home page, where more detailed description of this project is provided. However, with registration (you can register as jane@doe.com, no one will check you (just in case you think I can steal your email)) a whole bunch of features becomes available. In fact, you can do anything that is provided by the back-end. You can post public global files, or contacts-only global files. You can save files for a personal use. You can send files to someone, if they are your contact. To make a contact you have to send a request to the user, and to do that you need to ask the user to show you (out of the aplication) their public id, which is sort of a phone number, if to consider it from such point of view that it's a magnet for contact requests. So after the user have shown or told you their public id, you can paste/type it into the contact request creation form and submit it. The user receiving the contact request can accept it, reject it or reject and block you. In case of successfull acceptation of the request you become contacts, and you can perform different actions with the contact, such as: blocking the contact, sending files to contact, viewing files related to the contact and deleting the contact. 
+You can also save files to your personal files.
+Of course, filtering, sorting and searching is provided.
+
+To get more info about the project, visit it's home page: {{url_to_my_website}}/home.
+
 ## About Laravel
 
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
