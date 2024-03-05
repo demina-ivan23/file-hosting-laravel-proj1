@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CookieController;
+use App\Http\Controllers\PluploadUploadController;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,3 +22,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::middleware('web')->post('/save-canvas-cookie', [CookieController::class, 'store'])->name('save-canvas-cookie');
 Route::middleware('web')->post('/update-canvas-cookie', [CookieController::class, 'update'])->name('update-canvas-cookie');
+Route::middleware('web')->delete('/delete-plupload-folder/{uuid}', [PluploadUploadController::class, 'destroy'])->name('delete-plupload-folder');

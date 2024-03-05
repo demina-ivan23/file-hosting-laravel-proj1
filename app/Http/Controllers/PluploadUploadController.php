@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Services\PluploadUploadService;
+use Illuminate\Support\Facades\Storage;
 
 class PluploadUploadController extends Controller
 {
@@ -64,8 +65,8 @@ class PluploadUploadController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $uuid)
     {
-        //
+        Storage::deleteDirectory('temp_files/'.$uuid);
     }
 }

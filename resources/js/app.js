@@ -234,6 +234,9 @@ const app = createApp({
                         // console.log(form.action);
                         form.submit(); 
                     }
+                    if(up.state === plupload.STOPPED && filesUploaded !== true){
+                        const response = axios.delete(`/api/delete-plupload-folder/${uuid}`);
+                    }
                 });
                 uploader.bind('UploadProgress', function (up, file) {
                     document.getElementById(file.id).getElementsByTagName('b')[0].innerHTML = '<span>' + file.percent + "%</span>";
