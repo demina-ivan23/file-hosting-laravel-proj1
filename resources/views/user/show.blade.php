@@ -74,24 +74,7 @@
             (When someone wants to add you as a contact, they need to paste or type it in a certain field. So make sure you show it only to the people you trust.)
         </div>
        
-        <div class="d-flex justify-content-between mt-10">
-            @if (0)
-                
-            @else
-            <div>
-            
-                <h5>You have no channel yet.</h5>
-            </div>
-            <div>
-                <form action="#">
-                    @csrf
-                        <button type="submit">
-                            <img src="{{asset('storage/icons/add-button.png')}}" alt="" width="40" title="create a channel">
-                        </button>
-                    </form>
-            </div>
-                @endif
-        </div>
+        
     </div>
 </div>
     @else
