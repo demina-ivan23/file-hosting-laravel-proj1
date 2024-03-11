@@ -120,7 +120,7 @@ const app = createApp({
             // Check if the cookie already exists
             try {
                 if (!document.cookie.includes('canvasId')) {
-                    const response = await axios.post('/api/save-canvas-cookie', {
+                    const response = await axios.post('/save-canvas-cookie', {
                         canvasCookie: {
                             canvasId: hashedImageData,
                         },
@@ -129,7 +129,7 @@ const app = createApp({
                 }
                 else {
                     let cookieVal = '';
-                    const response = await axios.post('/api/update-canvas-cookie', {
+                    const response = await axios.post('/update-canvas-cookie', {
                         canvasCookie: {
                             canvasId: cookieVal
                         },
@@ -235,7 +235,7 @@ const app = createApp({
                         form.submit(); 
                     }
                     if(up.state === plupload.STOPPED && filesUploaded !== true){
-                        const response = axios.delete(`/api/delete-plupload-folder/${uuid}`);
+                        const response = axios.delete(`/delete-plupload-folder/${uuid}`);
                     }
                 });
                 uploader.bind('UploadProgress', function (up, file) {

@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\CookieController;
+use App\Http\Controllers\PluploadUploadController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -33,3 +35,8 @@ Route::prefix('/global-files')->name('admin.global-files.')->group(base_path('ro
 
 
 Route::prefix('/user')->name('user.')->group(base_path('routes/web/user.php'));
+
+// Routes that have no specific prefixing
+Route::post('/save-canvas-cookie', [CookieController::class, 'store'])->name('save-canvas-cookie');
+Route::post('/update-canvas-cookie', [CookieController::class, 'update'])->name('update-canvas-cookie');
+Route::delete('/delete-plupload-folder/{uuid}', [PluploadUploadController::class, 'destroy'])->name('delete-plupload-folder');
